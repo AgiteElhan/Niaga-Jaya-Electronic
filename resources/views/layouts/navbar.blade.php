@@ -32,7 +32,7 @@
             <ul class="list-unstyled p-0 m-0">
               <li class="p-3 border-bottom ">
                 <div class="d-flex gap-3">
-                  <img src="./assets/images/avatar/avatar-1.jpg" alt="" class="avatar avatar-sm rounded-circle" />
+                  <img src="{{asset('assets/images/avatar/avatar-1.jpg')}}" alt="" class="avatar avatar-sm rounded-circle" />
                   <div class="flex-grow-1 small">
                     <p class="mb-0">New order received</p>
                     <p class="mb-1">Order #12345 has been placed</p>
@@ -42,7 +42,7 @@
               </li>
               <li class="p-3 border-bottom ">
                 <div class="d-flex gap-3">
-                  <img src="./assets/images/avatar/avatar-4.jpg" alt="" class="avatar avatar-sm rounded-circle" />
+                  <img src="{{asset('assets/images/avatar/avatar-4.jpg')}}" alt="" class="avatar avatar-sm rounded-circle" />
                   <div class="flex-grow-1 small">
                     <p class="mb-0">New user registered</p>
                     <p class="mb-1">User @john_doe has signed up</p>
@@ -52,7 +52,7 @@
 
               <li class="p-3 border-bottom">
                 <div class="d-flex gap-3">
-                  <img src="./assets/images/avatar/avatar-2.jpg" alt="" class="avatar avatar-sm rounded-circle" />
+                  <img src="{{asset('assets/images/avatar/avatar-2.jpg')}}" alt="" class="avatar avatar-sm rounded-circle" />
                   <div class="flex-grow-1 small">
                     <p class="mb-0">Payment confirmed</p>
                     <p class="mb-1">Payment of $299 has been received</p>
@@ -69,12 +69,12 @@
         <!-- Dropdown -->
         <li class="ms-3 dropdown">
           <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="./assets/images/avatar/avatar-1.jpg" alt="" class="avatar avatar-sm rounded-circle" />
+            <img src="{{asset('assets/images/avatar/avatar-1.jpg')}}" alt="" class="avatar avatar-sm rounded-circle" />
           </a>
           <div class="dropdown-menu dropdown-menu-end p-0" style="min-width: 200px;">
             <div>
               <div class="d-flex gap-3 align-items-center border-dashed border-bottom px-3 py-3">
-                <img src="./assets/images/avatar/avatar-1.jpg" alt="" class="avatar avatar-md rounded-circle" />
+                <img src="{{asset('assets/images/avatar/avatar-1.jpg')}}" alt="" class="avatar avatar-md rounded-circle" />
                 <div>
                   <h4 class="mb-0 small">Shrina Tesla</h4>
                   <p class="mb-0  small">@imshrina</p>

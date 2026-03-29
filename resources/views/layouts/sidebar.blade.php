@@ -1,9 +1,9 @@
 <aside id="sidebar" class="sidebar">
     <div class="logo-area">
       <a href="index.html" class="d-inline-flex">
-      <img src="./assets/images/logo-icon.svg" alt="" width="24">
+      <img src="{{asset('assets/images/logo-icon.svg')}}" alt="" width="24">
         <span class="logo-text ms-2">
-          <img src="./assets/images/logo.svg" alt="">
+          <img src="{{asset('assets/images/logo.svg')}}" alt="">
         </span>
       </a>
     </div>
@@ -11,28 +11,52 @@
       <li class="px-4 py-2">
         <small class="nav-text">Main</small>
       </li>
+      
       <li>
-        <a class="nav-link active" href="index.html">
+        <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" 
+          href="{{ route('admin.dashboard')}}">
           <i class="ti ti-home"></i>
           <span class="nav-text">Dashboard</span>
         </a>
       </li>
+
       <li>
-        <a class="nav-link" href="inventory.html">
+        <a class="nav-link {{ request()->routeIs('admin.kategori') ? 'active show' : '' }}" 
+   href="{{route('admin.kategori')}}">
           <i class="ti ti-box-seam"></i>
           <span class="nav-text">Kategori</span>
         </a>
       </li>
+
       <li>
-        <a class="nav-link" href="inventory.html">
+        <a class="nav-link {{ request()->routeIs('admin.merk') ? 'active' : '' }}" 
+          href="{{route('admin.merk')}}">
           <i class="ti ti-box-seam"></i>
           <span class="nav-text">Merk</span>
         </a>
       </li>
+
       <li>
-        <a class="nav-link" href="inventory.html">
+        <a class="nav-link {{ request()->routeIs('admin.product') ? 'active' : '' }}" 
+          href="{{route('admin.product')}}">
           <i class="ti ti-box-seam"></i>
           <span class="nav-text">Produk</span>
+        </a>
+      </li>
+
+      <li>
+        <a class="nav-link {{ request()->routeIs('admin.supplier') ? 'active' : '' }}" 
+          href="{{route('admin.supplier')}}">
+          <i class="ti ti-box-seam"></i>
+          <span class="nav-text">Supplier</span>
+        </a>
+      </li>
+
+      <li>
+        <a class="nav-link {{ request()->routeIs('admin.user') ? 'active' : '' }}" 
+          href="{{route('admin.user')}}">
+          <i class="ti ti-box-seam"></i>
+          <span class="nav-text">User</span>
         </a>
       </li>
       {{-- <li>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-{{-- @section('title','SiAsri Gemba Karta - Dashboard') --}}
+@section('title','Niaga Jaya Electronic - Dashboard')
     
 @section('content')
     @livewire('admin.dashboard.index')
