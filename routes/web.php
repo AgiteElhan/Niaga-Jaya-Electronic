@@ -12,24 +12,36 @@ Route::view('/', 'auth.login');
 Route::middleware(['auth','role:admin'])
     ->prefix('admin')
     ->name('admin.')
-    ->group(function () {
+    ->group(function ()  {
 
     Route::get('/dashboard', function () {
         return view('admin.dashboard.index');
     })->name('dashboard');
 
+   // --- KATEGORI ---
     Route::get('/kategori', function () {
         return view('admin.kategori.index');
     })->name('kategori');
 
+    Route::get('/kategori/create', function () {
+        return view('admin.kategori.create');
+    })->name('kategori.create');
+
+    Route::post('/kategori', function () {
+        // Untuk proses simpan data nanti
+    })->name('kategori.store');
+
+     // --- MERK ---
     Route::get('/merk', function () {
         return view('admin.merk.index');
     })->name('merk');
 
+    // --- PRODUCT ---
     Route::get('/product', function () {
         return view('admin.product.index');
     })->name('product');
 
+    // --- SUPPLIER ---
     Route::get('/supplier', function () {
         return view('admin.supplier.index');
     })->name('supplier');
