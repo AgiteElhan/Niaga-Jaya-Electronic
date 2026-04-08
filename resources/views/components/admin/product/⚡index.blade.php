@@ -7,8 +7,8 @@ new class extends Component
     //
 };
 ?>
-
 <div>
+<div class="p-4">
 
     <div class="card">
 
@@ -113,14 +113,14 @@ new class extends Component
             </div>
 
             <!-- PAGINATION -->
-            <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="d-flex justify-content-between align-items-center mt-3 ps-4">
 
                 <div class="text-muted small">
                     Menampilkan 1 sampai 10 dari 100 data
                 </div>
 
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
+                    <ul class="pagination pagination-sm mb-0 p-4">
                         <li class="page-item disabled"><a class="page-link">«</a></li>
                         <li class="page-item active"><a class="page-link">1</a></li>
                         <li class="page-item"><a class="page-link">2</a></li>
@@ -140,4 +140,5 @@ new class extends Component
     @include('components.admin.product.edit')
     @include('components.admin.product.delete')
 
+</div>
 </div>

@@ -93,16 +93,20 @@
       <small class="nav-text">Account</small>
     </li>
     <li>
-      <a class="nav-link" href="signin.html">
+      <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+          @csrf
+      </form>
+      <a class="nav-link" href="{{ route('logout') }}" 
+        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
         <i class="ti ti-logout"></i>
-        <span class="nav-text">Log in</span>
+        <span class="nav-text">Log out</span>
       </a>
     </li>
-    <li>
+    <!-- <li>
       <a class="nav-link" href="signup.html">
         <i class="ti ti-user-plus"></i>
         <span class="nav-text">Sign up</span>
       </a>
-    </li>
+    </li> -->
   </ul>
 </aside>

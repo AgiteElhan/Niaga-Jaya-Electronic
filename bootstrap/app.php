@@ -12,9 +12,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-         $middleware->alias([
-        'role' => RoleMiddleware::class,
-    ]);
+        // Ini alias yang sudah kamu punya
+        $middleware->alias([
+            'role' => RoleMiddleware::class,
+        ]);
+
+        // TAMBAHKAN INI:
+        // Ini adalah "Buku Alamat" otomatis Laravel
+        $middleware->redirectTo(
+            guests: '/',                // Kalau orang asing (belum login), lempar ke pintu depan
+            users: '/admin/dashboard'   // Kalau Bos (sudah login), lempar ke Dashboard Admin
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

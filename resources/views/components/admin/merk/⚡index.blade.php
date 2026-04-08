@@ -9,12 +9,12 @@ new class extends Component
 ?>
 
 <div>
-<div> <!-- ROOT -->
+<div class="p-4"> <!-- ROOT -->
 
     <div class="card">
 
         <!-- HEADER -->
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-header d-flex justify-content-between align-items-center px-4">
             <h6 class="mb-0">Daftar Merk</h6>
 
             <button 
@@ -98,14 +98,14 @@ new class extends Component
             </div>
 
             <!-- PAGINATION -->
-            <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="d-flex justify-content-between align-items-center mt-3 ps-4">
 
                 <div class="text-muted small">
                     Menampilkan 1 sampai 10 dari 100 data
                 </div>
 
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
+                    <ul class="pagination pagination-sm mb-0 p-4">
                         <li class="page-item disabled"><a class="page-link">«</a></li>
                         <li class="page-item active"><a class="page-link">1</a></li>
                         <li class="page-item"><a class="page-link">2</a></li>
