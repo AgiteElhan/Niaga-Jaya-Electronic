@@ -146,12 +146,12 @@
                 <button type="submit" class="login-btn">Login</button>
             </form>
 
-            <div class="login-or">atau</div>
+            <!-- <div class="login-or">atau</div>
 
             <div class="login-register">
                 Belum punya akun?
                 <a href="{{ route('register') }}">Daftar Sekarang</a>
-            </div>
+            </div> -->
 
         </div>
     </div>
