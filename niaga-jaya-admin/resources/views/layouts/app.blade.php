@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
   @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   @livewireStyles
 </head>
 
@@ -39,10 +38,8 @@
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script> --}}
     <script src="{{ asset('assets/js/sidebar.js') }}"></script>
-    <script src="{{ asset('assets/js/chart.js') }}"></script>
     @livewireScripts
     <script src="{{ asset('assets/js/alert.js')}}"></script>
 
