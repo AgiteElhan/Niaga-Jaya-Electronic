@@ -1,4 +1,4 @@
-<div class="modal fade" id="modalTambahMerk" tabindex="-1">
+<div wire:ignore.self class="modal fade" id="modalTambahMerk" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
 

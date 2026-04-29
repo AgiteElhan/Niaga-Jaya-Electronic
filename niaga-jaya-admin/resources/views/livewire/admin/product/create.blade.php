@@ -119,7 +119,7 @@
                     <div class="mb-3">
                         <label class="form-label">Gambar</label>
                         <span class="text-danger">*</span>
-                        <input type="file" wire:model="gambar"
+                        <input type="file" wire:model.live="gambar"
                             class="form-control @error('gambar') is-invalid @enderror">
 
                         @error('gambar')

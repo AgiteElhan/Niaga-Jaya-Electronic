@@ -44,7 +44,7 @@ class Index extends Component
         'kategori_id'                   => 'required',
         'merk_id'                       => 'required',
         'harga_jual'                    => 'required',
-        'harga_discount'                => 'required',
+        'harga_discount'                => 'nullable',
         'stok'                          => 'required',
         'deskripsi'                     => 'required',
         'gambar'                        => 'required|image|mimes:jpg,jpeg,png|max:2048',
@@ -74,14 +74,30 @@ class Index extends Component
     public function store()
     {
         $this->validate([
-            'kode_produk'   => 'required',
-            'nama_produk'   => 'required',
+            'kode_produk'    => 'required|unique:product,kode_produk',
+            'nama_produk'    => 'required',
             'kategori_id'    => 'required',
             'merk_id'        => 'required',
-            'harga_jual'     => 'required',
-            'stok'           => 'required',
-            'deskripsi'      => 'required',
-            'gambar'         => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'harga_jual'     => 'required|numeric|min:0',
+            'harga_discount' => 'nullable|numeric|min:0',
+            'stok'           => 'required|integer|min:0',
+            'deskripsi'      => 'required', 
+            'gambar'         => 'required|image|max:2048',
+        ],[
+            'kode_produk.required'   => 'Kode produk tidak boleh kosong.',
+            'kode_produk.unique'     => 'Kode produk sudah terdaftar di sistem.',
+            'nama_produk.required'   => 'Nama produk wajib diisi.',
+            'kategori_id.required'   => 'Kategori wajib diisi.',
+            'merk_id.required'       => 'Merk wajib diisi.',
+            'harga_jual.required'    => 'Harga wajib diisi.',
+            'harga_jual.numeric'     => 'Harga harus berupa angka.',
+            'harga_jual.min'         => 'Harga tidak boleh negatif.',
+            'stok.required'          => 'Stok wajib diisi.',
+            'stok.integer'           => 'Stok harus berupa angka bulat.',
+            'deskripsi.required'     => 'Deskripsi produk wajib diisi.',
+            'gambar.required'        => 'Gambar wajib diisi.',
+            'gambar.image'           => 'File harus berupa gambar.',
+            'gambar.max'             => 'Ukuran gambar maksimal 2MB.',
         ]);
 
         $namaGambar = time() . '.' . $this->gambar->extension();
@@ -128,7 +144,7 @@ class Index extends Component
             'kategori_id'    => 'required',
             'merk_id'        => 'required',
             'harga_jual'     => 'required',
-            'harga_discount' => 'required',
+            'harga_discount' => 'nullable',
             'stok'           => 'required',
             'deskripsi'      => 'required',
             'gambar'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -194,17 +210,20 @@ class Index extends Component
 
     public function render()
     {
+        // 1. Ambil data produk dengan relasi (Eager Loading)
         $product = Product::with(['kategori', 'merk'])
             ->when($this->search, function ($query) {
-                $query->where('nama_produk', 'like', '%' . $this->search . '%');
+                $query->where('nama_produk', 'like', '%' . $this->search . '%')
+                    ->orWhere('kode_produk', 'like', '%' . $this->search . '%'); // Tambahkan pencarian kode juga
             })
             ->latest()
             ->paginate((int) $this->paginate);
 
         return view('livewire.admin.product.index', [
             'dataProduct' => $product,
-            'kategori' => Kategori::all(),
-            'merk' => Merk::all(),
+            // Gunakan cache atau batasi pengambilan jika data kategori/merk sangat banyak
+            'kategori' => Kategori::orderBy('nama_kategori', 'asc')->get(),
+            'merk' => Merk::orderBy('nama_merk', 'asc')->get(),
         ]);
     }
 }

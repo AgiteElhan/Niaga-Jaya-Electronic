@@ -115,7 +115,7 @@
                                         <button wire:click="create" 
                                             class="btn btn-primary" 
                                             data-bs-toggle="modal" 
-                                            data-bs-target="#modalTambah">
+                                            data-bs-target="#modalTambahSupplier">
                                             <i class="bx bx-plus me-2"></i>
                                             Tambah Supplier Pertama
                                         </button>

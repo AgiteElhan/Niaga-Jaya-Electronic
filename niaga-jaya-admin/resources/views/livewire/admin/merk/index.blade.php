@@ -106,7 +106,7 @@
                                                     <button wire:click="create" 
                                                             class="btn btn-primary" 
                                                             data-bs-toggle="modal" 
-                                                            data-bs-target="#modalTambah">
+                                                            data-bs-target="#modalTambahMerk">
                                                         <i class="bx bx-plus me-2"></i>
                                                         Tambah Merk Pertama
                                                     </button>
