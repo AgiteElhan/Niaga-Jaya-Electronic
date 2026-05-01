@@ -374,3 +374,81 @@ document.addEventListener('livewire:init', () => {
         });
 
       })
+
+// alert create Banner
+document.addEventListener('livewire:init', () => {
+
+          Livewire.on('openModal', () => {
+              const modal = new bootstrap.Modal(document.getElementById('modalTambahBanner'))
+              modal.show()
+          })
+
+          Livewire.on('closeCreateModalBanner', () => {
+              const modalEl = document.getElementById('modalTambahBanner')
+
+              const modal = bootstrap.Modal.getOrCreateInstance(modalEl)
+              modal.hide()
+
+              modalEl.querySelector('form').reset()
+
+              Swal.fire({
+                  title: "Berhasil!",
+                  text: "Data Banner berhasil ditambahkan",
+                  icon: "success"
+              })
+          })
+
+      })
+
+// alert edit Banner
+document.addEventListener('livewire:init', () => {
+
+          Livewire.on('openModal', () => {
+              const modal = new bootstrap.Modal(document.getElementById('modalEditBanner'))
+              modal.show()
+          })
+
+          Livewire.on('closeEditModalBanner', () => {
+              const modalEl = document.getElementById('modalEditBanner')
+
+              const modal = bootstrap.Modal.getOrCreateInstance(modalEl)
+              modal.hide()
+
+              modalEl.querySelector('form').reset()
+
+              Swal.fire({
+                  title: "Berhasil!",
+                  text: "Data Banner berhasil diupdate",
+                  icon: "success"
+              })
+          })
+
+      })
+// alert delete Banner
+document.addEventListener('livewire:init', () => {
+
+          Livewire.on('openDeleteModalBanner', () => {
+            new bootstrap.Modal(document.getElementById('modalDeleteBanner')).show();
+        });
+
+          Livewire.on('closeDeleteModalBanner', () => {
+            const modalEl = document.getElementById('modalDeleteBanner');
+
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.hide();
+
+            // 🔥 HAPUS backdrop yang nyangkut
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+
+            // 🔥 BALIKIN scroll body
+            document.body.classList.remove('modal-open');
+            document.body.style = '';
+
+            Swal.fire({
+                title: "Berhasil!",
+                text: "Data Banner berhasil dihapus",
+                icon: "success"
+            });
+        });
+
+      })

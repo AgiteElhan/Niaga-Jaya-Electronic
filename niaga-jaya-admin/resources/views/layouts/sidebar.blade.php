@@ -69,6 +69,14 @@
           <span class="nav-text">User</span>
         </a>
       </li>
+
+      <li>
+        <a class="nav-link {{ request()->routeIs('admin.banner') ? 'active' : '' }}" 
+          href="{{route('admin.banner')}}">
+          <i class="ti ti-users"></i>
+          <span class="nav-text">Banner</span>
+        </a>
+      </li>
       {{-- <li>
         <a class="nav-link" href="inventory.html">
           <i class="ti ti-box-seam"></i>

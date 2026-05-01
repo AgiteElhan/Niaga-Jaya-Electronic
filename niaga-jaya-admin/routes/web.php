@@ -46,9 +46,13 @@ Route::middleware(['auth','role:admin'])
         return view('admin.supplier.index');
     })->name('supplier');
 
-     Route::get('/user', function () {
+    Route::get('/user', function () {
         return view('admin.user.index');
     })->name('user');
+
+    Route::get('/banner', function () {
+        return view('admin.banner.index');
+    })->name('banner');
 });
 
 // Route::get('/dashboard', function () {

@@ -10,9 +10,6 @@ const Home = () => {
     <Button size="lg">Check Out</Button>
     </Container>
   )
-     
- 
-  
 };
 
 export default Home;
