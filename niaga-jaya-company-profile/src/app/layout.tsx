@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { AosProvider } from "@/components/AosProvider"; // Import Provider baru
 
 const fontPoppins = Poppins({
   subsets: ["latin"],
@@ -23,9 +24,11 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${fontPoppins.className} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-white">
-        <Navbar />
-        <div className="flex-1">{children}</div>
-        <Footer />
+        <AosProvider> {/* Bungkus di sini agar AOS aktif */}
+          <Navbar />
+          <div className="flex-1">{children}</div>
+          <Footer />
+        </AosProvider>
       </body>
     </html>
   );

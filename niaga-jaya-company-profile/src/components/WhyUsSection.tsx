@@ -36,27 +36,34 @@ const reasons = [
 
 export default function WhyUsSection() {
   return (
-    <section id="about" className="max-w-6xl mx-auto px-4 py-16">
+    <section id="about" className="max-w-6xl mx-auto px-4 py-16 overflow-hidden">
       {/* Heading */}
-      <div className="text-center mb-12">
+      <div 
+        className="text-center mb-12"
+        data-aos="fade-up" // Heading muncul dari bawah
+      >
         <p className="text-gray-400 text-sm mb-2">
-          Bia Blablaba biabal balabal balbala balbal
+          Layanan Unggulan Niaga Jaya Electronic
         </p>
         <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900">
-          Kenapa Harus di Toko Kami ?
+          Kenapa Harus di Toko Kami?
         </h2>
       </div>
 
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {reasons.map((r) => (
+        {reasons.map((r, index) => (
           <div
             key={r.title}
-            className={`${r.color} rounded-3xl p-6 flex flex-col items-center text-center gap-4 border border-gray-100 hover:shadow-lg transition-shadow`}
+            data-aos="fade-up" // Kartu muncul dari bawah
+            data-aos-delay={index * 200} // Muncul bergantian (0ms, 200ms, 400ms)
+            className={`${r.color} rounded-3xl p-6 flex flex-col items-center text-center gap-4 border border-gray-100 hover:shadow-lg transition-all hover:-translate-y-2 duration-300`}
           >
             {/* Icon */}
             <div
               className={`w-16 h-16 ${r.iconBg} rounded-2xl flex items-center justify-center text-3xl shadow-md`}
+              data-aos="zoom-in" // Efek zoom khusus untuk icon
+              data-aos-delay={(index * 200) + 300} // Icon muncul setelah kartu
             >
               {r.icon}
             </div>

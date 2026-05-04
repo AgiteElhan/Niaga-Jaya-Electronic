@@ -81,7 +81,7 @@ class Index extends Component
     {
         $this->validate([
             'nama_banner'    => 'required',
-            'gambar'         => 'required|image|max:2048',
+            'gambar'         => 'nullable|image|max:2048',
         ]);
 
         $banner = Banner::findOrFail($this->banner_id);

@@ -1,5 +1,7 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const testimonials = [
   {
@@ -69,6 +71,14 @@ export default function TestimonialSection() {
   const startX = useRef(0);
   const scrollLeftRef = useRef(0);
 
+  // Inisialisasi AOS khusus jika tidak menggunakan Provider global
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    });
+  }, []);
+
   const onMouseDown = (e: React.MouseEvent) => {
     isDragging.current = true;
     startX.current = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
@@ -85,7 +95,6 @@ export default function TestimonialSection() {
     isDragging.current = false;
   };
 
-  // Update active dot saat scroll
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -98,14 +107,12 @@ export default function TestimonialSection() {
     return () => el.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Klik dot → scroll ke card
   const scrollToIndex = (i: number) => {
     if (!scrollRef.current) return;
     const cardWidth = scrollRef.current.scrollWidth / testimonials.length;
     scrollRef.current.scrollTo({ left: cardWidth * i, behavior: "smooth" });
   };
 
-  // Prev / Next
   const scroll = (dir: "left" | "right") => {
     const next =
       dir === "left"
@@ -115,11 +122,14 @@ export default function TestimonialSection() {
   };
 
   return (
-    <section id="testimoni" className="bg-[#F8FAFC] py-16">
+    <section id="testimoni" className="bg-[#F8FAFC] py-16 overflow-hidden">
       <div className="max-w-6xl mx-auto px-4">
         {/* Heading + Arrows */}
-        <div className="flex items-center justify-between mb-10">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">
+        <div 
+          className="flex items-center justify-between mb-10"
+          data-aos="fade-up"
+        >
+          <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900">
             Testimoni & Kepuasan Pelanggan
           </h2>
           <div className="flex gap-2">
@@ -151,10 +161,16 @@ export default function TestimonialSection() {
           {testimonials.map((t, i) => (
             <div
               key={i}
-              className="min-w-[280px] md:min-w-[340px] bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex-shrink-0"
+              data-aos="fade-left" // Muncul meluncur dari kanan ke kiri
+              data-aos-delay={i * 150} // Jeda antar kartu
+              className="min-w-[280px] md:min-w-[340px] bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex-shrink-0 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-full bg-[#2563EB] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                <div 
+                  className="w-12 h-12 rounded-full bg-[#2563EB] flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+                  data-aos="zoom-in"
+                  data-aos-delay={(i * 150) + 300} // Avatar muncul belakangan dengan efek zoom
+                >
                   {getInitials(t.name)}
                 </div>
                 <div>
@@ -174,7 +190,11 @@ export default function TestimonialSection() {
         </div>
 
         {/* Dots Indicator */}
-        <div className="flex justify-center gap-2 mt-6">
+        <div 
+          className="flex justify-center gap-2 mt-6"
+          data-aos="fade-up"
+          data-aos-offset="0" // Muncul segera tanpa perlu scroll jauh ke bawah indikator
+        >
           {testimonials.map((_, i) => (
             <button
               key={i}
