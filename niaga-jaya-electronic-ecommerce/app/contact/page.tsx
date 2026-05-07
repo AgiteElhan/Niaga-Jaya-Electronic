@@ -58,7 +58,7 @@ const ContactPage = () => {
             {/* Google Maps Embed */}
             <div className="w-full h-64 rounded-2xl overflow-hidden border border-gray-100 shadow-sm mt-4">
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.3313361405!2d106.4996!3d-6.2201!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMTMnMTIuNCJTIDEwNiwzMCcwMC4wIkU!5e0!3m2!1sid!2sid!4v1714640000000!5m2!1sid!2sid" 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.260314936072!2d106.5191208!3d-6.229371800000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e42070b17e56eb5%3A0xd55347f779ce508e!2sNiaga%20Jaya%20Elektronik%20Pasar%20Cikupa!5e0!3m2!1sid!2sid!4v1778163202912!5m2!1sid!2sid"
                 width="100%" 
                 height="100%" 
                 style={{ border: 0 }} 

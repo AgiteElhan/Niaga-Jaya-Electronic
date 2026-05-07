@@ -1,27 +1,50 @@
-"use client"
+"use client";
 
-import { Search, X, ShoppingBag } from "lucide-react"
-import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { dummyProducts } from "./constants/product" // Pastikan path ini sesuai struktur folder kamu
+import { Search, X, ShoppingBag } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+
+// Interface disesuaikan dengan output ProductController Anda
+interface Product {
+  id: number;
+  nama_produk: string;
+  harga_jual: string;
+  gambar_url: string; // Menggunakan gambar_url hasil transform asset()
+  kategori?: {
+    nama_kategori: string;
+  };
+}
 
 const SearchBar = () => {
   const [search, setSearch] = useState("");
-  const [results, setResults] = useState<typeof dummyProducts>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [results, setResults] = useState<Product[]>([]);
 
   useEffect(() => {
-    // Pencarian dimulai jika karakter lebih dari 1
+    const fetchAllProducts = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/products");
+        const data = await response.json();
+        setAllProducts(data);
+      } catch (error) {
+        console.error("Gagal load produk untuk search:", error);
+      }
+    };
+    fetchAllProducts();
+  }, []);
+
+  useEffect(() => {
     if (search.trim().length > 1) {
-      const filtered = dummyProducts.filter(product =>
-        product.name.toLowerCase().includes(search.toLowerCase()) ||
-        product.category.toLowerCase().includes(search.toLowerCase())
+      const filtered = allProducts.filter(product =>
+        product.nama_produk.toLowerCase().includes(search.toLowerCase()) ||
+        product.kategori?.nama_kategori.toLowerCase().includes(search.toLowerCase())
       );
       setResults(filtered);
     } else {
       setResults([]);
     }
-  }, [search]);
+  }, [search, allProducts]);
 
   return (
     <div className="relative w-full max-w-[200px] md:max-w-[300px]">
@@ -46,7 +69,6 @@ const SearchBar = () => {
         )}
       </div>
 
-      {/* Dropdown Hasil Pencarian */}
       {results.length > 0 && (
         <div className="fixed md:absolute top-[70px] md:top-full left-0 md:-left-64 lg:-left-96 mt-4 
                         w-[95vw] md:w-[600px] lg:w-[800px] bg-white border border-gray-100 
@@ -63,33 +85,36 @@ const SearchBar = () => {
             {results.map((product) => (
               <Link 
                 key={product.id}
-                // Menghubungkan ke page detail berdasarkan id produk
-                href={`/product/${product.id}`}
-                onClick={() => setSearch("")}
+                href={`/product/${product.id}`} 
+                
+                // Sangat Penting: Tutup dropdown search setelah barang diklik
+                onClick={() => {
+                  setSearch("");
+                  setResults([]);
+                }}
                 className="flex items-center gap-4 p-3 rounded-2xl hover:bg-blue-50/50 border border-transparent hover:border-blue-100 transition-all group"
               >
                 {/* Preview Gambar Produk */}
                 <div className="w-16 h-16 bg-white border border-gray-100 rounded-xl flex-shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden p-2">
-                  {product.images && product.images[0] ? (
-                    <Image 
-                      src={product.images[0]} 
-                      alt={product.name} 
-                      width={64} 
-                      height={64} 
-                      className="object-contain w-full h-full"
-                    />
-                  ) : (
-                    <ShoppingBag className="w-6 h-6 text-gray-200" />
-                  )}
+                  <Image 
+                    src={product.gambar_url} 
+                    alt={product.nama_produk} 
+                    width={64} 
+                    height={64} 
+                    className="object-contain w-full h-full"
+                    unoptimized 
+                  />
                 </div>
 
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-bold text-blue-500 uppercase mb-0.5">{product.category}</span>
+                  <span className="text-[10px] font-bold text-blue-500 uppercase mb-0.5">
+                    {product.kategori?.nama_kategori || "Elektronik"}
+                  </span>
                   <span className="text-sm font-bold text-gray-800 line-clamp-1 group-hover:text-blue-600 transition-colors">
-                    {product.name}
+                    {product.nama_produk}
                   </span>
                   <span className="text-sm font-black text-gray-900 mt-1">
-                    Rp {product.price.toLocaleString('id-ID')}
+                    Rp {Number(product.harga_jual).toLocaleString('id-ID')}
                   </span>
                 </div>
               </Link>
@@ -108,7 +133,7 @@ const SearchBar = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default SearchBar
+export default SearchBar;

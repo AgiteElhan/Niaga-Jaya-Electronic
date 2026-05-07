@@ -32,7 +32,7 @@ const Footer = () => {
           {/* Kolom 1: About */}
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-4">
-              <Title className="text-xl font-bold">About Us</Title>
+              <Title className="text-xl font-bold">Tentang Kami</Title>
               <p className="text-gray-600 text-sm leading-relaxed">
                 Niaga Jaya Electronic adalah pusat perlengkapan elektronik rumah tangga dan kantor terpercaya. Kami berkomitmen menyediakan produk berkualitas dengan harga distributor.
               </p>
@@ -84,16 +84,16 @@ const Footer = () => {
 
           {/* Kolom 4: Contact Us */}
           <div className="flex flex-col gap-4">
-            <Title className="text-xl font-bold">Contact Us</Title>
+            <Title className="text-xl font-bold">Kontak Kami</Title>
             <div className="text-gray-600 text-sm flex flex-col gap-2">
               <p className="flex items-center gap-2">
                 <span className="font-semibold text-blue-600">Email:</span> elektronikniagajaya@gmail.com
               </p>
               <p className="flex items-center gap-2">
-                <span className="font-semibold text-blue-600">Phone:</span> +62 813 1994 6436
+                <span className="font-semibold text-blue-600">Nomor Handphone:</span> +62 813 1994 6436
               </p>
               <p className="flex items-start">
-                <span className="font-semibold text-blue-600">Address:  </span> Niaga Jaya Elektronik Pasar Cikupa, Ps. Cikupa, di Jl. Raya Serang No.KM 15, Cikupa, Kec. Cikupa, Kabupaten Tangerang, Banten 15710
+                <span className="font-semibold text-blue-600">Alamat:</span> Niaga Jaya Elektronik Pasar Cikupa, Ps. Cikupa, di Jl. Raya Serang No.KM 15, Cikupa, Kec. Cikupa, Kabupaten Tangerang, Banten 15710
               </p>
             </div>
           </div>

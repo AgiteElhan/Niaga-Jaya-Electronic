@@ -14,6 +14,9 @@ Route::get('/user', function (Request $request) {
 
 // Pastikan penulisan Route dimulai dengan huruf kapital R
 Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{id}', [ProductController::class, 'show']);
 
 // Pastikan diletakkan di luar middleware auth agar bisa diakses Next.js publik
 Route::get('/banners', [BannerController::class, 'index']);
+
+Route::get('/categories', [App\Http\Controllers\Api\CategoryController::class, 'index']);

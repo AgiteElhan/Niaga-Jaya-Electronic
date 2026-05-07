@@ -21,6 +21,9 @@ const figtree = Figtree({
 export const metadata: Metadata = {
   title: "Niaga Jaya Electronic",
   description: "Solusi Elektronik Terpercaya",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

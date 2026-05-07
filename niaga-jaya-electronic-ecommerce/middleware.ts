@@ -1,12 +1,13 @@
+// middleware.ts
 import { clerkMiddleware } from "@clerk/nextjs/server";
 
-// Pastikan kamu mengekspor clerkMiddleware sebagai default
 export default clerkMiddleware();
 
 export const config = {
   matcher: [
-    // Pastikan matcher ini mencakup rute /shop dan /contact
+    // Menjalankan middleware untuk semua rute kecuali file statis
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Selalu jalankan untuk API routes
     '/(api|trpc)(.*)',
   ],
 };

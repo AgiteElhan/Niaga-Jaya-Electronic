@@ -4,57 +4,29 @@ import HomeBanner from "@/components/HomeBanner";
 import CategoryList from "@/components/CategoryList";
 import ProductGrid from "@/components/ProductGrid";
 import PaymentBanner from "@/components/PaymentBanner";
+import Link from 'next/link';
 
-// 1. Data Dummy Lokal
-const dummyProducts = [
-  {
-    id: 1,
-    name: "Mesin Cuci LG TurboWash 12kg",
-    category: "MESIN CUCI",
-    price: 4500000,
-    image_url: "/products/mesin-cuci.png",
-  },
-  {
-    id: 2,
-    name: "Kulkas Samsung Side by Side 500L",
-    category: "KULKAS",
-    price: 8200000,
-    image_url: "/products/kulkas.png",
-  },
-  {
-    id: 3,
-    name: "Smart TV Sony Bravia 4K 55 Inch",
-    category: "TELEVISI",
-    price: 12500000,
-    image_url: "/products/tv.png",
-  },
-  {
-    id: 4,
-    name: "AC Sharp 1/2 PK Sayonara Panas",
-    category: "AC",
-    price: 3450000,
-    image_url: "/products/ac.png",
-  },
-  {
-    id: 5,
-    name: "Microwave Panasonic Digital",
-    category: "ELEKTRONIK",
-    price: 1850000,
-    image_url: "/products/microwave.png",
-  },
-  {
-    id: 6,
-    name: "Dispenser Modena Bottom Loading",
-    category: "ELEKTRONIK",
-    price: 2700000,
-    image_url: "/products/dispenser.png",
-  },
+// 1. Fungsi untuk mengambil data dari API Route Next.js
+async function getProducts() {
+  // Kita panggil endpoint internal yang ada di app/api/products/route.ts
+  const res = await fetch("http://localhost:3000/api/products", {
+    cache: "no-store", // Agar data stok/harga selalu fresh dari database Niaga Jaya
+  });
 
+  if (!res.ok) {
+    // Jika gagal, kita bisa kembalikan array kosong agar halaman tidak crash
+    console.error("Gagal mengambil data produk");
+    return [];
+  }
 
-];
+  return res.json();
+}
 
-// 2. Komponen Utama ShopPage
-const ShopPage = () => {
+// 2. Ubah Komponen menjadi async
+const ShopPage = async () => {
+  // Panggil fungsi fetch data
+  const products = await getProducts();
+
   return (
     <Container>
       <div className="flex flex-col gap-10 pb-20 pt-4">
@@ -73,11 +45,16 @@ const ShopPage = () => {
             <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
               Produk Terbaru
             </h2>
-            <button className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+            <Link 
+              href="/shop" 
+              className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors flex items-center"
+            >
               Lihat Semua →
-            </button>
+            </Link>
           </div>
-          <ProductGrid products={dummyProducts} />
+          
+          {/* 3. Masukkan data 'products' dari API ke ProductGrid */}
+          <ProductGrid products={products} />
         </section>
 
         {/* Banner Pembayaran Cicilan */}

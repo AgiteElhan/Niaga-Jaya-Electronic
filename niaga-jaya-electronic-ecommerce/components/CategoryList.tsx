@@ -24,7 +24,7 @@ const CategoryList = () => {
     <section className="py-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-slate-800">Kategori Pilihan</h2>
-        <Link href="/categories" className="text-sm font-medium text-blue-600 hover:underline flex items-center">
+        <Link href="/shop" className="text-sm font-medium text-blue-600 hover:underline flex items-center">
           Lihat Semua <ChevronRight size={16} />
         </Link>
       </div>
