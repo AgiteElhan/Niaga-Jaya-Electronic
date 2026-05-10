@@ -45,7 +45,7 @@ const milestones = [
   {
     year: "2017",
     title: "Ekspansi Produk",
-    desc: "Memperluas jenis produk dari hanya elektronik rumah tangga menjadi mencakup aksesoris dan gadget.",
+    desc: "Memperluas jenis produk dari hanya elektronik rumah tangga menjadi mencakup aksesoris.",
   },
   {
     year: "2020",
@@ -85,7 +85,10 @@ export default function AboutPage() {
 
       {/* ── 2. STORY ── */}
       <section className="max-w-6xl mx-auto px-4 py-16">
-        <div className="flex flex-col md:flex-row items-center gap-12">
+        <div
+          className="flex flex-col md:flex-row items-center gap-12"
+          data-aos="fade-up"
+        >
           {/* Gambar toko */}
           <div className="md:w-1/2 w-full">
             <div className="relative rounded-3xl overflow-hidden shadow-xl bg-[#EEF2FF] h-72 md:h-96">
@@ -93,7 +96,6 @@ export default function AboutPage() {
                 src="/assets/toko.webp"
                 alt="Toko Niaga Jaya Electronic"
                 className="w-full h-full object-cover"
-                
               />
               {/* Overlay badge */}
               <div className="absolute bottom-4 left-4 bg-white rounded-2xl px-4 py-3 shadow-lg">
@@ -141,7 +143,7 @@ export default function AboutPage() {
 
       {/* ── 3. STATS ── */}
       <section className="bg-[#2563EB] py-14">
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4" data-aos="fade-up">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
             {stats.map((s) => (
               <div key={s.label}>
@@ -159,7 +161,7 @@ export default function AboutPage() {
 
       {/* ── 4. VISI & MISI ── */}
       <section className="max-w-6xl mx-auto px-4 py-16">
-        <div className="text-center mb-12">
+        <div className="text-center mb-12" data-aos="fade-up">
           <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">
             Visi & Misi Kami
           </h2>
@@ -168,7 +170,10 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          data-aos="fade-up"
+        >
           {/* Visi */}
           <div className="bg-[#EEF2FF] rounded-3xl p-8 border border-blue-100">
             <div className="w-12 h-12 bg-[#2563EB] rounded-2xl flex items-center justify-center text-2xl mb-5 shadow">
@@ -208,7 +213,7 @@ export default function AboutPage() {
 
       {/* ── 5. NILAI PERUSAHAAN ── */}
       <section className="bg-[#F8FAFC] py-16">
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4" data-aos="fade-up">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">
               Nilai yang Kami Pegang
@@ -237,7 +242,7 @@ export default function AboutPage() {
 
       {/* ── 6. MILESTONE / PERJALANAN ── */}
       <section className="max-w-6xl mx-auto px-4 py-16">
-        <div className="text-center mb-12">
+        <div className="text-center mb-12" data-aos="fade-up">
           <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">
             Perjalanan Kami
           </h2>
@@ -246,7 +251,7 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="relative">
+        <div className="relative" data-aos="fade-up">
           {/* Garis tengah (desktop) */}
           <div className="hidden md:block absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-gray-200" />
 
@@ -286,7 +291,10 @@ export default function AboutPage() {
 
       {/* ── 7. CTA ── */}
       <section className="bg-[#2563EB] py-16">
-        <div className="max-w-6xl mx-auto px-4 text-center text-white">
+        <div
+          className="max-w-6xl mx-auto px-4 text-center text-white"
+          data-aos="fade-up"
+        >
           <h2 className="text-2xl md:text-4xl font-extrabold mb-4">
             Siap Berbelanja Bersama Kami?
           </h2>

@@ -50,25 +50,23 @@ export default function HeroSection() {
             </a>
           </div>
 
-        {/* Right: Product Image — 2 gambar overlap */}
-          <div className="md:w-1/2 flex justify-center">
-
-            <div className="relative w-[380px] h-[320px]">
+          {/* Right: Product Image — 2 gambar overlap */}
+          <div className="w-full md:w-1/2 flex justify-center">
+            <div className="hidden md:flex relative w-full max-w-[320px] h-[260px] md:w-[380px] md:h-[320px]">
               {/* Gambar TV — di belakang, posisi kiri bawah */}
               <img
                 src="/assets/tv.webp"
                 alt="Televisi"
-                className="absolute bottom-0 left-0 w-[260px] drop-shadow-xl z-10"
+                className="absolute bottom-0 left-0  w-[180px] md:w-[260px] drop-shadow-xl z-10"
               />
 
               {/* Gambar Setrika — di depan, posisi kanan atas, sedikit miring */}
               <img
                 src="/assets/setrika.webp"
                 alt="Setrika"
-                className="absolute bottom-0 left-50 w-[200px] drop-shadow-xl z-20 "
+                className="absolute bottom-0 left-50 w-[140px] md:w-[200px] drop-shadow-xl z-20 "
               />
             </div>
-
           </div>
         </div>
 

@@ -5,7 +5,7 @@ export default function Footer() {
   const gmapsUrl = "https://maps.app.goo.gl/668vW93aeYRKN7Yw6?g_st=ac";
 
   return (
-    <footer className="bg-white pt-10 pb-16 border-t border-gray-100 overflow-hidden">
+    <footer id="contact" className="bg-white pt-10 pb-16 border-t border-gray-100 overflow-hidden">
       <div className="max-w-6xl mx-auto px-4">
         
         {/* Card Lokasi (CTA Section) */}

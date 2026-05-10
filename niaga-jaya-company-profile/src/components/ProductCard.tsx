@@ -3,7 +3,7 @@ import { Product } from '@/types/product';
 export default function ProductCard({ product }: { product: Product }) {
   return (
     <div 
-      className="bg-white rounded-2xl p-4 shadow-sm flex flex-col gap-2 hover:shadow-lg transition-all group"
+      className="bg-white rounded-2xl p-4 shadow-sm flex flex-col gap-2 hover:shadow-lg transition-all group "
       data-aos="fade-up" // Kartu muncul dari bawah
       data-aos-duration="600"
     >
