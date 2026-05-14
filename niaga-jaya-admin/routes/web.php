@@ -53,6 +53,22 @@ Route::middleware(['auth','role:admin'])
     Route::get('/banner', function () {
         return view('admin.banner.index');
     })->name('banner');
+
+    Route::get('/pesanan', function () {
+        return view('admin.pesanan.index');
+    })->name('pesanan');
+
+    Route::get('/stok-masuk', function () {
+        return view('admin.stok-masuk.index');
+    })->name('stok-masuk');
+
+    Route::get('/laporan-penjualan', function () {
+        return view('admin.laporan-penjualan.index');
+    })->name('laporan-penjualan');
+
+    Route::get('/laporan-stok', function () {
+        return view('admin.laporan-stok.index');
+    })->name('laporan-stok');
 });
 
 // Route::get('/dashboard', function () {

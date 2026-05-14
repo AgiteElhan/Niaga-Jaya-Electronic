@@ -452,3 +452,28 @@ document.addEventListener('livewire:init', () => {
         });
 
       })
+
+// alert add stok
+document.addEventListener('livewire:init', () => {
+
+          Livewire.on('openModal', () => {
+              const modal = new bootstrap.Modal(document.getElementById('modalTambahStokMasuk'))
+              modal.show()
+          })
+
+          Livewire.on('closeCreateModalStokMasuk', () => {
+              const modalEl = document.getElementById('modalTambahStokMasuk')
+
+              const modal = bootstrap.Modal.getOrCreateInstance(modalEl)
+              modal.hide()
+
+              modalEl.querySelector('form').reset()
+
+              Swal.fire({
+                  title: "Berhasil!",
+                  text: "Berhasil Menambahkan Stok Produk",
+                  icon: "success"
+              })
+          })
+
+      })
