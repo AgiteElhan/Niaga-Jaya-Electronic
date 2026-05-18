@@ -19,6 +19,10 @@ class StokMasuk extends Model
     {
         return $this->belongsTo(Supplier::class, 'supplier_id');
     }
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'produk_id');
+    }
 
     public function items()
     {
