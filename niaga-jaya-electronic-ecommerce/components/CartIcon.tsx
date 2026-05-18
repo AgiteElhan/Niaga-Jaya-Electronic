@@ -5,19 +5,27 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/store/useCartStore';
 
+// 1. IMPORT HOOK CLERK UNTUK MENGECEK STATUS LOGOUT/LOGIN
+import { useUser } from '@clerk/nextjs';
+
 const CartIcon = () => {
   const cart = useCartStore((state) => state.cart);
   const [mounted, setMounted] = useState(false);
+
+  // 2. AMBIL STATUS SIGN-IN DARI CLERK
+  const { isSignedIn, isLoaded } = useUser();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Hitung total item
-  const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+  // 3. LOGIKA DINAMIS: Jika user belum login, paksa total item jadi 0
+  const totalItems = isSignedIn && isLoaded
+    ? cart.reduce((total, item) => total + item.quantity, 0)
+    : 0;
 
   // Mencegah Hydration Error
-  if (!mounted) {
+  if (!mounted || !isLoaded) {
     return (
       <Link href='/cart' className='group relative inline-block p-2'>
         <ShoppingBag className='w-6 h-6 group-hover:text-blue-600 transition-colors duration-300' />

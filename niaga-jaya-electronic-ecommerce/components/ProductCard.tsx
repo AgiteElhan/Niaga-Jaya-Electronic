@@ -4,15 +4,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Star, ShoppingBag } from "lucide-react";
+// Import global state store keranjang kamu
+import { useCartStore } from "@/store/useCartStore"; 
 
-// Struktur Interface data product agar tidak menggunakan tipe 'any'
+// GUNAKAN HOOK useUser DAN SIGNINBUTTON UNTUK KOMPONEN CLIENT YANG AMAN
+import { useUser, SignInButton } from "@clerk/nextjs";
+
 interface Product {
   id: number | string;
-  name: string;
-  price: number;
-  images?: string[];
-  image?: string;
-  rating?: number;
+  nama_produk: string;  
+  harga_jual: string | number; 
+  gambar?: string;      
+  gambar_url?: string;  
+  stok?: number;        
+  deskripsi?: string;   
 }
 
 interface ProductCardProps {
@@ -20,17 +25,39 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  // Ambil fungsi addToCart dari Zustand store
+  const { addToCart } = useCartStore();
   
-  // Fungsi dipindahkan ke dalam agar aman membaca properti objek `product`
+  // Ambil status login user di client side
+  const { isSignedIn } = useUser();
+
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // Mencegah Link ikut terpicu saat tombol keranjang diklik
     e.preventDefault(); 
     e.stopPropagation();
 
+    if (product.stok !== undefined && Number(product.stok) <= 0) {
+      toast.error("Gagal", {
+        description: `Maaf, stok ${product.nama_produk} sedang habis.`,
+      });
+      return;
+    }
+
+    // Masukkan objek data produk murni dari database ke dalam global state keranjang
+    addToCart({
+      id: Number(product.id),
+      nama_produk: product.nama_produk,
+      harga_jual: Number(product.harga_jual),
+      gambar_url: product.gambar_url || "/placeholder.png",
+      quantity: 1 // Default penambahan pertama
+    });
+
     toast.success("Berhasil!", {
-      description: `${product.name} telah ditambahkan ke keranjang.`,
+      description: `${product.nama_produk} telah ditambahkan ke keranjang.`,
     });
   };
+
+  const numericPrice = product.harga_jual ? Number(product.harga_jual) : 0;
+  const displayImage = product.gambar_url ? product.gambar_url : "/placeholder.png";
 
   return (
     <div className="group relative bg-white rounded-[28px] border border-slate-100 p-4 hover:shadow-2xl hover:shadow-blue-100 transition-all duration-500 flex flex-col justify-between h-full">
@@ -38,12 +65,20 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link href={`/product/${product.id}`} className="block flex-1">
         {/* Kontainer Gambar */}
         <div className="relative aspect-square bg-slate-50 rounded-[22px] overflow-hidden mb-4">
-          <Image 
-            src={product.images?.[0] || product.image || "/placeholder.png"} 
-            alt={product.name} 
-            fill 
-            className="object-contain p-6 group-hover:scale-110 transition-transform duration-500" 
-          />
+          {product.gambar_url || product.gambar ? (
+            <img 
+              src={displayImage} 
+              alt={product.nama_produk}
+              className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-500"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/placeholder.png";
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
+              Tidak ada gambar
+            </div>
+          )}
         </div>
 
         {/* Detail & Informasi Produk */}
@@ -56,22 +91,54 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
           
           <h3 className="font-bold text-slate-800 line-clamp-1 group-hover:text-blue-600 transition-colors">
-            {product.name}
+            {product.nama_produk || "Produk Tanpa Nama"}
           </h3>
           
           <p className="text-xl font-black text-blue-600">
-            Rp {product.price ? product.price.toLocaleString("id-ID") : "0"}
+            Rp {numericPrice.toLocaleString("id-ID")}
           </p>
         </div>
       </Link>
 
-      {/* Tombol Aksi Tambah Ke Keranjang */}
-      <button 
-        onClick={handleAddToCart}
-        className="w-full mt-4 bg-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 active:scale-[0.98] transition-all"
-      >
-        <ShoppingBag size={18} /> + Keranjang
-      </button>
+      {/* PROTEKSI TOMBOL AKSI TAMBAH KE KERANJANG */}
+      <div>
+        {isSignedIn ? (
+          /* JALUR A: USER SUDAH LOGIN -> Tombol menjalankan handleAddToCart secara normal */
+          <button 
+            onClick={handleAddToCart}
+            disabled={Number(product.stok) === 0}
+            className={`w-full mt-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
+              Number(product.stok) === 0 
+                ? "bg-slate-200 text-slate-400 cursor-not-allowed" 
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
+          >
+            <ShoppingBag size={18} /> 
+            {Number(product.stok) === 0 ? "Stok Habis" : "+ Keranjang"}
+          </button>
+        ) : (
+          /* JALUR B: USER BELUM LOGIN -> Tombol dipisah fungsinya, cuma memicu modal Clerk login */
+          <SignInButton mode="modal">
+            <button 
+              onClick={(e) => {
+                // Menahan event klik agar card link tidak ikut memicu rute ganti halaman
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              disabled={Number(product.stok) === 0}
+              className={`w-full mt-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
+                Number(product.stok) === 0 
+                  ? "bg-slate-200 text-slate-400 cursor-not-allowed" 
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
+            >
+              <ShoppingBag size={18} /> 
+              {Number(product.stok) === 0 ? "Stok Habis" : "+ Keranjang"}
+            </button>
+          </SignInButton>
+        )}
+      </div>
+
     </div>
   );
 }

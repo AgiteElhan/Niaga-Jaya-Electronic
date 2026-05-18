@@ -26,13 +26,15 @@ export const metadata: Metadata = {
   },
 };
 
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    // PASTE KODE PK_TEST_ LU DI SINI:
+    <ClerkProvider publishableKey="pk_test_cG9zc2libGUtbW9sZS05LmNsZXJrLmFjY291bnRzLmRldiQ">
       <html lang="en" className="h-full scroll-smooth">
         <body 
           className={cn(
@@ -41,7 +43,6 @@ export default function RootLayout({
             figtree.variable
           )}
         >
-          {/* Toaster diletakkan di sini agar bisa muncul di semua halaman */}
           <Toaster 
             position="top-center" 
             richColors 
@@ -51,7 +52,6 @@ export default function RootLayout({
 
           <Header />
 
-          {/* Menambahkan flex-1 agar footer tetap di bawah jika konten sedikit */}
           <main className="flex-1">
             {children}
           </main>

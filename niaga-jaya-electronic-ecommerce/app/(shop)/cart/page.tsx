@@ -4,11 +4,17 @@ import React, { useState, useEffect } from "react";
 import Container from "@/components/ui/Container";
 import EmptyCart from "@/components/EmptyCart";
 import { useCartStore } from "@/store/useCartStore";
-import { Trash2, ShoppingBag, CreditCard } from "lucide-react";
+import { Trash2, ShoppingBag, CreditCard, Lock } from "lucide-react"; // <-- Tambah ikon Lock
 import { Button } from "@/components/ui/button";
+
+// 1. IMPORT HOOK DAN COMPONENT DARI CLERK
+import { useUser, SignInButton } from "@clerk/nextjs";
 
 const CartPage = () => {
   const { cart, removeFromCart } = useCartStore();
+  
+  // 2. AMBIL STATUS LOGIN USER DI CLIENT SIDE
+  const { isSignedIn, isLoaded } = useUser();
   
   // State untuk menyimpan ID produk yang dicentang
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -23,8 +29,34 @@ const CartPage = () => {
     }
   }, [cart]);
 
-  if (!mounted) return null;
+  // Tunggu sampai Next.js mounted dan Clerk selesai loading data status user
+  if (!mounted || !isLoaded) return null;
 
+  // 3. JIKA USER BELUM LOGIN: TAMPILKAN HALAMAN BLOCKED NYAMAN
+  if (!isSignedIn) {
+    return (
+      <Container>
+        <div className="py-24 max-w-md mx-auto text-center flex flex-col items-center justify-center px-4">
+          <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6 animate-pulse">
+            <Lock size={36} strokeWidth={2.5} />
+          </div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-3">
+            Akses Keranjang Terkunci
+          </h1>
+          <p className="text-slate-500 text-sm leading-relaxed mb-8 font-medium">
+            Untuk melihat barang belanjaan dan melanjutkan transaksi di <span className="font-bold text-blue-600">Niaga Jaya Electronic</span>, Anda harus masuk ke akun Anda terlebih dahulu.
+          </p>
+          <SignInButton mode="modal">
+            <Button className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-base font-bold shadow-lg shadow-blue-100 flex items-center justify-center gap-2 transition-all active:scale-95">
+              Login Sekarang
+            </Button>
+          </SignInButton>
+        </div>
+      </Container>
+    );
+  }
+
+  // JIKA USER SUDAH LOGIN TAPI KERANJANG KOSONG
   if (cart.length === 0) {
     return (
       <Container>
