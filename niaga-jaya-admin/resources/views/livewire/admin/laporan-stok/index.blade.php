@@ -4,16 +4,20 @@
     <div class="card">
 
         <!-- HEADER -->
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h6 class="mb-0">Laporan Stok</h6>
-
-            {{-- <button 
-                class="btn btn-primary btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#modalTambahProduk">
-                <i class="ti ti-plus me-1"></i>
-                Tambah
-            </button> --}}
+        <div class="card-header d-flex justify-content-between align-items-center bg-light">
+            <h6 class="mb-0 fw-bold text-primary">
+                <i class="ti ti-clipboard-list me-1"></i> Laporan Kondisi Stok Produk
+            </h6>
+            <div class="btn-group gap-2">
+                {{-- Tombol Cetak PDF --}}
+                <a href="{{ route('admin.laporan.stok.pdf') }}" target="_blank" class="btn btn-danger btn-sm">
+                    <i class="ti ti-file-type-pdf me-1"></i> Cetak PDF
+                </a>
+                {{-- Tombol Cetak Excel --}}
+                <button class="btn btn-success btn-sm">
+                    <i class="ti ti-file-type-xls me-1"></i> Cetak Excel
+                </button>
+            </div>
         </div>
 
         <!-- BODY -->
@@ -140,6 +144,8 @@
             </div>
         </div>
     </div>
+
+    @include('livewire.admin.laporan-stok.detail')
 
 
 </div>

@@ -8,6 +8,7 @@ use App\Models\StokMasukItem;
 use App\Models\Product;
 use App\Models\Supplier;
 use Livewire\WithPagination;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class Index extends Component
@@ -52,6 +53,24 @@ class Index extends Component
         $this->selectedStok = StokMasuk::with(['supplier', 'items.product'])->find($id);
     }
 
+    public function exportPdf()
+    {
+        // Ambil data stok masuk beserta relasi supplier dan itemnya
+        $stokMasukData = StokMasuk::with(['supplier', 'items.product'])
+            ->where('nomor_referensi', 'like', '%' . $this->search . '%')
+            ->latest()
+            ->get();
+
+        // Load view khusus cetakan PDF formal
+        $pdf = Pdf::loadView('pdf.laporan-stok-masuk', [
+            'stokMasukData' => $stokMasukData
+        ])->setPaper('a4', 'portrait'); // <-- UBAH DI SINI: dari 'landscape' menjadi 'portrait'
+
+        // Mengunduh berkas secara instan memanfaatkan stream internal bawaan Livewire
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, 'Laporan_Stok_Masuk_' . date('Ymd_His') . '.pdf');
+    }
 
 
     public function create()

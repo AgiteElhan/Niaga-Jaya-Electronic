@@ -19,6 +19,8 @@ class Index extends Component
     public $stok;
     public $deskripsi;
     public $gambar;
+    public $selectedProduct;
+
 
     public $delete_id;
     public $product_id;
@@ -46,6 +48,12 @@ class Index extends Component
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+    public function showDetail($id)
+    {
+        // Mengambil data produk beserta relasi kategori dan merknya
+        $this->selectedProduct = \App\Models\Product::with(['kategori', 'merk'])->find($id);
     }
     public function render()
     {

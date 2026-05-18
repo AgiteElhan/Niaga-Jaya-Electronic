@@ -4,15 +4,41 @@
             <div class="card">
                 <!-- HEADER -->
                 <div class="card-header d-flex justify-content-between align-items-center px-4">
-                    <h6 class="mb-0">Daftar Stok Masuk</h6>
+                    <h6 class="mb-0 fw-bold text-primary">
+                        <i class="ti ti-clipboard-list me-1"></i> Daftar Stok Masuk
+                    </h6>
 
-                    <button wire:click="create"
-                        class="btn btn-primary btn-sm"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalTambahStokMasuk">
-                        <i class="ti ti-plus me-1"></i>
-                        Tambah
-                    </button>
+                    <div class="d-flex gap-2">
+                        <div class="btn-group gap-2">
+                            {{-- Tombol Cetak PDF via Livewire --}}
+                            <button wire:click="exportPdf" wire:loading.attr="disabled" class="btn btn-danger btn-sm">
+                                <span wire:loading.remove wire:target="exportPdf">
+                                    <i class="ti ti-file-type-pdf me-1"></i> PDF
+                                </span>
+                                <span wire:loading wire:target="exportPdf">
+                                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>...
+                                </span>
+                            </button>
+
+                            {{-- Tombol Cetak Excel via Livewire --}}
+                            <button wire:click="exportExcel" wire:loading.attr="disabled" class="btn btn-success btn-sm">
+                                <span wire:loading.remove wire:target="exportExcel">
+                                    <i class="ti ti-file-type-xls me-1"></i> Excel
+                                </span>
+                                <span wire:loading wire:target="exportExcel">
+                                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>...
+                                </span>
+                            </button>
+                        </div>
+
+                        <button wire:click="create"
+                            class="btn btn-primary btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalTambahStokMasuk">
+                            <i class="ti ti-plus me-1"></i>
+                            Tambah
+                        </button>
+                    </div>
                 </div>
 
                 <div class="card-body">

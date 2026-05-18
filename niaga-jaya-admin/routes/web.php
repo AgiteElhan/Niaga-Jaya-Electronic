@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LaporanCetakController;
+
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -69,6 +71,10 @@ Route::middleware(['auth','role:admin'])
     Route::get('/laporan-stok', function () {
         return view('admin.laporan-stok.index');
     })->name('laporan-stok');
+
+    Route::get('/laporan/stok/pdf', [LaporanCetakController::class, 'cetakStokProduk'])->name('laporan.stok.pdf');
+
+    Route::get('/stok-masuk/{id}/pdf', [LaporanCetakController::class, 'cetakNotaStokMasuk'])->name('stok-masuk.pdf');
 });
 
 // Route::get('/dashboard', function () {

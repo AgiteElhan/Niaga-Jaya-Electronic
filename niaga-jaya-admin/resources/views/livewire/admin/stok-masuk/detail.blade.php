@@ -88,9 +88,8 @@
             <div class="modal-footer bg-light d-flex justify-content-between">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 
-                <!-- Tombol Cetak PDF -->
                 @if($selectedStok)
-                <a href="#" target="_blank" class="btn btn-danger">
+                <a href="{{ route('admin.stok-masuk.pdf', $selectedStok->id) }}" target="_blank" class="btn btn-danger">
                     <i class="ti ti-file-type-pdf me-2"></i>Cetak PDF
                 </a>
                 @endif
