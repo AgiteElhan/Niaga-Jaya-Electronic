@@ -1,59 +1,77 @@
-import React from 'react';
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { Product } from "@/types/product"; // Pastikan path ini sesuai dengan folder types yang kamu buat
+import { toast } from "sonner";
+import { Star, ShoppingBag } from "lucide-react";
+
+// Struktur Interface data product agar tidak menggunakan tipe 'any'
+interface Product {
+  id: number | string;
+  name: string;
+  price: number;
+  images?: string[];
+  image?: string;
+  rating?: number;
+}
 
 interface ProductCardProps {
   product: Product;
 }
 
-// Ganti 'any' dengan 'ProductCardProps'
-const ProductCard = ({ product }: ProductCardProps) => {
+export default function ProductCard({ product }: ProductCardProps) {
+  
+  // Fungsi dipindahkan ke dalam agar aman membaca properti objek `product`
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Mencegah Link ikut terpicu saat tombol keranjang diklik
+    e.preventDefault(); 
+    e.stopPropagation();
+
+    toast.success("Berhasil!", {
+      description: `${product.name} telah ditambahkan ke keranjang.`,
+    });
+  };
+
   return (
-    <Link href={`/product/${product.id}`}>
-      <div className="group bg-white rounded-2xl border border-slate-100 p-3 hover:shadow-xl transition-all duration-300">
-        
+    <div className="group relative bg-white rounded-[28px] border border-slate-100 p-4 hover:shadow-2xl hover:shadow-blue-100 transition-all duration-500 flex flex-col justify-between h-full">
+      
+      <Link href={`/product/${product.id}`} className="block flex-1">
         {/* Kontainer Gambar */}
-        <div className="relative aspect-square overflow-hidden rounded-xl bg-slate-50">
-          <Image
-            src={product.gambar_url || "/placeholder.png"}
-            alt={product.nama_produk}
-            fill
-            className="object-contain"
-            unoptimized // Tambahkan ini sementara untuk tes apakah optimasi Next.js yang bikin masalah
+        <div className="relative aspect-square bg-slate-50 rounded-[22px] overflow-hidden mb-4">
+          <Image 
+            src={product.images?.[0] || product.image || "/placeholder.png"} 
+            alt={product.name} 
+            fill 
+            className="object-contain p-6 group-hover:scale-110 transition-transform duration-500" 
           />
         </div>
 
-        {/* Info Produk */}
-        <div className="mt-4 px-1">
-          <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">
-            {/* Menggunakan relasi kategori dari backend */}
-            {product.kategori?.nama_kategori || "Elektronik"}
-          </p>
-
-          <h3 className="text-sm font-medium text-slate-800 line-clamp-2 leading-snug min-h-[40px]">
-            {product.nama_produk}
+        {/* Detail & Informasi Produk */}
+        <div className="space-y-1 px-2">
+          <div className="flex items-center gap-1 text-yellow-500 mb-1">
+            <Star size={12} fill="currentColor" />
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+              Niaga Jaya Official
+            </span>
+          </div>
+          
+          <h3 className="font-bold text-slate-800 line-clamp-1 group-hover:text-blue-600 transition-colors">
+            {product.name}
           </h3>
           
-          <div className="mt-3 flex items-center justify-between">
-            <div>
-              <p className="text-base font-bold text-slate-900">
-                {/* Konversi ke Number() karena Decimal dari DB biasanya terbaca String */}
-                Rp {product.harga_jual ? Number(product.harga_jual).toLocaleString('id-ID') : '0'}
-              </p>
-              <p className="text-[10px] text-slate-500 mt-0.5">Stok: {product.stok}</p>
-            </div>
-
-            <div className="bg-slate-100 p-1.5 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14"/><path d="M12 5v14"/>
-              </svg>
-            </div>
-          </div>
+          <p className="text-xl font-black text-blue-600">
+            Rp {product.price ? product.price.toLocaleString("id-ID") : "0"}
+          </p>
         </div>
-      </div>
-    </Link>
-  );
-};
+      </Link>
 
-export default ProductCard;
+      {/* Tombol Aksi Tambah Ke Keranjang */}
+      <button 
+        onClick={handleAddToCart}
+        className="w-full mt-4 bg-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 active:scale-[0.98] transition-all"
+      >
+        <ShoppingBag size={18} /> + Keranjang
+      </button>
+    </div>
+  );
+}

@@ -5,14 +5,13 @@ import Logo from './logo'
 import HeaderMenu from './ui/HeaderMenu'
 import SearchBar from './SearchBar'
 import CartIcon from './CartIcon'
-import FavoriteButton from './FavoriteButton'
+// import { FavoriteNav } from './FavoriteNav'
 import MobileMenu from './MobileMenu' 
-import SignIn from './SignIn' // Cukup panggil komponen ini
-import { currentUser } from '@clerk/nextjs/server'
+import SignIn from './SignIn'
+import { Package } from 'lucide-react' // Tambahkan ini
+import Link from 'next/link' // Tambahkan ini
 
 const Header = async () => {
-  const user = await currentUser(); // Tetap bisa ambil data user di sini kalau butuh
-
   return (
     <header className="border-b py-4 bg-white sticky top-0 z-50">
       <Container className="flex items-center justify-between h-full gap-2 md:gap-4">
@@ -30,9 +29,20 @@ const Header = async () => {
           <SearchBar />
           
           <div className="flex items-center gap-2 sm:gap-4">
-            <FavoriteButton />
+            {/* IKON TRACKING BARU */}
+            <Link 
+              href="/orders" 
+              className="p-2 hover:bg-slate-100 rounded-full transition-colors group relative"
+            >
+              <Package size={24} className="text-slate-700 group-hover:text-blue-600" />
+              {/* Tooltip sederhana */}
+              <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                Pesanan Saya
+              </span>
+            </Link>
+
+            {/* <FavoriteNav /> */}
             <CartIcon />
-            {/* Login diproses di dalam komponen ini */}
             <SignIn /> 
           </div>
         </div>

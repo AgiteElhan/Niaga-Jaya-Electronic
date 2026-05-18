@@ -1,133 +1,158 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Container from "@/components/ui/Container";
-import ProductGrid from "@/components/ProductGrid";
-import ShopSidebar from "@/components/shop/ShopSidebar";
-import { SlidersHorizontal, LayoutGrid } from "lucide-react";
-
-// ... (import tetap sama)
+import { SlidersHorizontal, LayoutGrid, Check } from "lucide-react";
+// Import ProductCard dan data dummy
+import ProductCard from "@/components/ProductCard";
+import { dummyProducts } from "@/components/constants/product";
 
 export default function ShopPage() {
-  const [products, setProducts] = useState<any[]>([]); // Data asli dari API
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([]); // Data yang ditampilkan
-  const [loading, setLoading] = useState(true);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<any>(null);
 
-  // State untuk menyimpan pilihan filter
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [selectedPriceRange, setSelectedPriceRange] = useState<{ min: number; max: number } | null>(null);
+  // 1. Ekstrak data unik untuk filter
+  const categories = Array.from(new Set(dummyProducts.map((p) => p.category)));
+  const brands = Array.from(new Set(dummyProducts.map((p) => p.name.split(" ")[0])));
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("http://127.0.0.1:8000/api/products");
-        const data = await response.json();
-        setProducts(data);
-        setFilteredProducts(data); // Set awal, tampilkan semua
-      } catch (error) {
-        console.error("Gagal mengambil data produk:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
+  const priceRanges = [
+    { label: "Semua Harga", min: 0, max: 100000000 },
+    { label: "", min: 0, max: 2000000 },
+    { label: "2 - 5 Juta", min: 2000000, max: 5000000 },
+    { label: "Di atas 5 Juta", min: 5000000, max: 100000000 },
+  ];
 
-  // LOGIKA FILTER: Jalankan setiap kali kriteria filter berubah
-  // Logika Filtering
-  useEffect(() => {
-    let result = products;
-
-    // 1. Filter berdasarkan Kategori (kategori_id)
-    if (selectedCategories.length > 0) {
-      result = result.filter((product: any) => 
-        selectedCategories.includes(Number(product.kategori_id))
-      );
-    }
-
-    // 2. Filter berdasarkan Rentang Harga (harga_jual)
-    if (selectedPriceRange) {
-      result = result.filter((product: any) => {
-        // Konversi harga_jual dari string "2999999.00" menjadi angka
-        const hargaProduk = parseFloat(product.harga_jual);
-        
-        return (
-          hargaProduk >= selectedPriceRange.min && 
-          hargaProduk <= selectedPriceRange.max
-        );
-      });
-    }
-
-    setFilteredProducts(result);
-  }, [selectedCategories, selectedPriceRange, products]);
-
-  // Handler untuk Sidebar
-  const handleCategoryChange = (ids: number[]) => {
-    setSelectedCategories(ids);
+  // 2. Logika Toggle Filter
+  const toggleFilter = (item: string, state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => {
+    setState((prev) => (prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]));
   };
 
-  const handlePriceChange = (range: { min: number; max: number } | null) => {
-    setSelectedPriceRange(range);
-  };
+  // 3. LOGIKA FILTERING PRODUK (Inti dari halaman Shop)
+  const filteredProducts = dummyProducts.filter((product) => {
+    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
+    const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.name.split(" ")[0]);
+    const matchesPrice = !selectedPriceRange || (product.price >= selectedPriceRange.min && product.price <= selectedPriceRange.max);
+    
+    return matchesCategory && matchesBrand && matchesPrice;
+  });
 
   return (
     <Container>
       <div className="py-12">
-
-       <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-blue-600 font-bold text-xs uppercase tracking-[0.2em]">
-              <LayoutGrid size={14} /> Catalog Niaga Jaya
+        {/* HEADER */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-blue-600 font-bold text-[10px] uppercase tracking-[0.3em]">
+              <LayoutGrid size={12} strokeWidth={3} /> Niaga Jaya Catalog
             </div>
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-5xl font-black text-slate-900 tracking-tighter">
               Katalog <span className="text-blue-600">Elektronik</span>
             </h1>
-            <p className="text-slate-500 font-medium">Cari kebutuhan rumah tangga terbaik Anda di sini.</p>
           </div>
-          
-          <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 text-slate-400 text-xs font-bold uppercase tracking-widest">
-            <SlidersHorizontal size={14} /> Filter
+          <div className="flex items-center gap-4 px-6 py-3 bg-white rounded-2xl border border-slate-100 shadow-sm text-slate-500 text-[10px] font-black uppercase tracking-widest">
+            <SlidersHorizontal size={14} /> {filteredProducts.length} Produk Ditemukan
           </div>
         </div>
 
-      <div className="flex flex-col lg:flex-row gap-12">
-        <div className="w-full lg:w-64 shrink-0">
-          <div className="sticky top-28">
-            <ShopSidebar 
-              onCategoryChange={handleCategoryChange} 
-              onPriceChange={handlePriceChange} 
-            />
-          </div>
-        </div>
-
-        <div className="flex-1">
-            <div className="bg-slate-50 p-2 rounded-[20px] mb-8 flex items-center gap-2 overflow-x-auto no-scrollbar border border-slate-100">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4 mr-2">Urutkan</span>
-              <button className="bg-white shadow-sm text-blue-600 px-6 py-2.5 rounded-2xl text-xs font-bold">Terpopuler</button>
-              <button className="text-slate-500 hover:bg-white px-6 py-2.5 rounded-2xl text-xs font-bold transition-all">Terbaru</button>
-              <button className="text-slate-500 hover:bg-white px-6 py-2.5 rounded-2xl text-xs font-bold transition-all">Harga</button>
-            </div>
-
-          {loading ? (
-             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="aspect-square bg-slate-100 animate-pulse rounded-2xl" />
-                ))}
+        <div className="flex flex-col lg:flex-row gap-16">
+          {/* SIDEBAR FILTER */}
+          <div className="w-full lg:w-60 shrink-0">
+            <div className="sticky top-32 space-y-12">
+              
+              {/* KATEGORI */}
+              <div className="flex flex-col gap-5">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Kategori</h4>
+                <div className="flex flex-col gap-3">
+                  {categories.map((cat) => (
+                    <label key={cat} className="flex items-center gap-3 group cursor-pointer">
+                      <div className="relative flex items-center justify-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes(cat)}
+                          onChange={() => toggleFilter(cat, selectedCategories, setSelectedCategories)}
+                          className="peer w-5 h-5 appearance-none rounded-lg border-2 border-slate-200 checked:border-blue-600 checked:bg-blue-600 transition-all cursor-pointer"
+                        />
+                        <Check size={12} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={4} />
+                      </div>
+                      <span className="text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors uppercase">
+                        {cat}
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
-          ) : (
-            // PAKAI filteredProducts, BUKAN products
-            <ProductGrid products={filteredProducts} />
-          )}
 
-          {/* Pesan jika produk tidak ditemukan */}
-          {!loading && filteredProducts.length === 0 && (
-            <div className="text-center py-20">
-              <p className="text-slate-400 font-medium">Tidak ada produk yang sesuai dengan filter.</p>
+              {/* MERK */}
+              <div className="flex flex-col gap-5">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Merk</h4>
+                <div className="flex flex-col gap-3">
+                  {brands.map((brand) => (
+                    <label key={brand} className="flex items-center gap-3 group cursor-pointer">
+                      <div className="relative flex items-center justify-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedBrands.includes(brand)}
+                          onChange={() => toggleFilter(brand, selectedBrands, setSelectedBrands)}
+                          className="peer w-5 h-5 appearance-none rounded-lg border-2 border-slate-200 checked:border-blue-600 checked:bg-blue-600 transition-all cursor-pointer"
+                        />
+                        <Check size={12} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={4} />
+                      </div>
+                      <span className="text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors">
+                        {brand}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* FILTER HARGA */}
+              <div className="flex flex-col gap-5">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Rentang Harga</h4>
+                <div className="flex flex-col gap-3">
+                  {priceRanges.map((range, index) => (
+                    <label key={index} className="flex items-center gap-3 group cursor-pointer">
+                      <input
+                        type="radio"
+                        name="price"
+                        checked={selectedPriceRange?.label === range.label}
+                        onChange={() => setSelectedPriceRange(range)}
+                        className="w-5 h-5 border-2 border-slate-200 text-blue-600 focus:ring-blue-600 transition-all cursor-pointer"
+                      />
+                      <span className="text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors">
+                        {range.label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* DISPLAY PRODUK */}
+          <div className="flex-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-12">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+
+            {/* Empty State */}
+            {filteredProducts.length === 0 && (
+              <div className="text-center py-24 bg-slate-50 rounded-[40px] border-2 border-dashed border-slate-200">
+                <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">
+                  Produk Tidak Ditemukan
+                </p>
+                <button 
+                  onClick={() => {setSelectedCategories([]); setSelectedBrands([]); setSelectedPriceRange(null);}}
+                  className="mt-4 text-blue-600 font-bold text-xs underline underline-offset-4"
+                >
+                  Reset Semua Filter
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
       </div>
     </Container>
   );

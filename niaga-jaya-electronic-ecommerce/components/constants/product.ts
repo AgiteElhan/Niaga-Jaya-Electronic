@@ -1,5 +1,22 @@
 // @/components/constants/product.ts
 
+/**
+ * Interface untuk setiap ulasan dari pengguna
+ * Memudahkan integrasi API di masa mendatang
+ */
+export interface Review {
+  id: string;
+  userName: string;
+  rating: number; // Skala 1-5
+  comment: string;
+  date: string;
+}
+
+/**
+ * Interface Utama Produk
+ * Data rating akan dihitung secara dinamis di sisi komponen 
+ * berdasarkan rata-rata dari array reviews
+ */
 export interface Product {
   id: number;
   name: string;
@@ -7,9 +24,9 @@ export interface Product {
   price: number;
   images: string[];
   rating: number;
-  reviews: number;
   stock: number;
   description: string;
+  reviews: Review[]; // Mendukung ulasan pengguna
 }
 
 export const dummyProducts: Product[] = [
@@ -24,9 +41,12 @@ export const dummyProducts: Product[] = [
       "/products/mesin-cuci-detail-2.png"
     ],
     rating: 4.8,
-    reviews: 124,
     stock: 15,
-    description: "Mesin cuci LG TurboWash memberikan performa pencucian maksimal hanya dalam waktu 59 menit. Dilengkapi dengan teknologi AI DD untuk menjaga keutuhan kain dan fitur Steam untuk membasmi alergen hingga 99.9%."
+    description: "Mesin cuci LG TurboWash memberikan performa pencucian maksimal hanya dalam waktu 59 menit. Dilengkapi dengan teknologi AI DD untuk menjaga keutuhan kain dan fitur Steam untuk membasmi alergen hingga 99.9%.",
+    reviews: [
+      { id: "rev-101", userName: "Budi Santoso", rating: 5, comment: "Hasil cucian sangat bersih dan suara mesin halus banget!", date: "12 Mei 2026" },
+      { id: "rev-102", userName: "Siti Aminah", rating: 4, comment: "Barang ori, pengiriman aman sampai depan pintu.", date: "10 Mei 2026" }
+    ]
   },
   {
     id: 2,
@@ -38,9 +58,11 @@ export const dummyProducts: Product[] = [
       "/products/kulkas-open.png"
     ],
     rating: 4.9,
-    reviews: 89,
     stock: 8,
-    description: "Kulkas Samsung Side by Side hadir dengan teknologi SpaceMax yang memungkinkan dinding kulkas lebih tipis sehingga kapasitas penyimpanan jauh lebih besar. Hemat energi dengan Digital Inverter."
+    description: "Kulkas Samsung Side by Side hadir dengan teknologi SpaceMax yang memungkinkan dinding kulkas lebih tipis sehingga kapasitas penyimpanan jauh lebih besar. Hemat energi dengan Digital Inverter.",
+    reviews: [
+      { id: "rev-201", userName: "Andi Wijaya", rating: 5, comment: "Kulkasnya mewah, kapasitasnya benar-benar lega untuk stok seminggu.", date: "14 Mei 2026" }
+    ]
   },
   {
     id: 3,
@@ -52,9 +74,9 @@ export const dummyProducts: Product[] = [
       "/products/tv-side.png"
     ],
     rating: 4.7,
-    reviews: 56,
     stock: 10,
-    description: "Nikmati pengalaman menonton bioskop di rumah dengan Sony Bravia 4K. Prosesor X1 menghasilkan gambar yang tajam dan kaya warna, didukung dengan Google TV untuk akses aplikasi streaming favorit Anda."
+    description: "Nikmati pengalaman menonton bioskop di rumah dengan Sony Bravia 4K. Prosesor X1 menghasilkan gambar yang tajam dan kaya warna, didukung dengan Google TV untuk akses aplikasi streaming favorit Anda.",
+    reviews: [] // Siap untuk menerima data ulasan dari API
   },
   {
     id: 4,
@@ -66,9 +88,11 @@ export const dummyProducts: Product[] = [
       "/products/ac-remote.png"
     ],
     rating: 4.6,
-    reviews: 210,
     stock: 25,
-    description: "AC Sharp Sayonara Panas J-Tech Inverter mendinginkan ruangan dengan cepat namun tetap hemat listrik. Fitur Plasmacluster menjaga udara tetap bersih dari bakteri dan jamur."
+    description: "AC Sharp Sayonara Panas J-Tech Inverter mendinginkan ruangan dengan cepat namun tetap hemat listrik. Fitur Plasmacluster menjaga udara tetap bersih dari bakteri dan jamur.",
+    reviews: [
+      { id: "rev-401", userName: "Rina Kartika", rating: 5, comment: "Dinginnya cepat merata, fitur plasmacluster bikin udara kamar segar.", date: "05 Mei 2026" }
+    ]
   },
   {
     id: 5,
@@ -79,9 +103,9 @@ export const dummyProducts: Product[] = [
       "/products/microwave.png"
     ],
     rating: 4.5,
-    reviews: 42,
     stock: 12,
-    description: "Microwave Panasonic mempermudah proses memasak dan menghangatkan makanan dengan kontrol digital yang presisi. Desain compact namun berkapasitas besar."
+    description: "Microwave Panasonic mempermudah proses memasak dan menghangatkan makanan dengan kontrol digital yang presisi. Desain compact namun berkapasitas besar.",
+    reviews: []
   },
   {
     id: 6,
@@ -92,8 +116,10 @@ export const dummyProducts: Product[] = [
       "/products/dispenser.png"
     ],
     rating: 4.8,
-    reviews: 75,
     stock: 7,
-    description: "Dispenser Modena dengan sistem galon bawah memudahkan penggantian air tanpa perlu mengangkat galon. Dilengkapi dengan 3 pilihan suhu: panas, dingin, dan normal."
+    description: "Dispenser Modena dengan sistem galon bawah memudahkan penggantian air tanpa perlu mengangkat galon. Dilengkapi dengan 3 pilihan suhu: panas, dingin, dan normal.",
+    reviews: [
+      { id: "rev-601", userName: "Hendra Kurniawan", rating: 5, comment: "Desain elegan, sangat membantu nggak perlu angkat galon berat lagi.", date: "01 Mei 2026" }
+    ]
   }
 ];
