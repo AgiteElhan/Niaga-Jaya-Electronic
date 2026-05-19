@@ -10,7 +10,10 @@ import { Button } from "@/components/ui/button";
 import ProductReviews from "@/components/ProductReviews";
 import CheckoutDialog from "@/components/CheckoutDialog";
 
-// 1. GANTI IMPORT-NYA JADI HOOK DAN BUTTON SAJA, GIT:
+// IMPORT SINKRONISASI GLOBAL STATE KERANJANG ZUSTAND
+import { useCartStore } from "@/store/useCartStore";
+
+// IMPORT SINKRONISASI CLERK CLIENT
 import { useUser, SignInButton } from "@clerk/nextjs";
 
 interface Product {
@@ -30,7 +33,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // 2. GUNAKAN HOOK useUser UNTUK MENGECEK STATUS LOGIN
+  // 1. AMBIL FUNGSI ADD TO CART DARI ZUSTAND STORE LU
+  const { addToCart } = useCartStore();
+
+  // Status login user di client side
   const { isSignedIn } = useUser();
 
   useEffect(() => {
@@ -66,6 +72,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   if (!product) return <div className="py-20 text-center font-bold text-red-500">Produk Tidak Ditemukan</div>;
 
+  // 2. LOGIC TAMBAH KERANJANG YANG SUDAH FIX RIIL NYETOR DATA KE ZUSTAND
   const handleAddToCart = () => {
     if (product.stok !== undefined && Number(product.stok) <= 0) {
       toast.error("Gagal", {
@@ -73,6 +80,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       });
       return;
     }
+
+    // SETOR DATA OBJEK PRODUK MURNI DARI DATABASE KE ZUSTAND
+    addToCart({
+      id: Number(product.id),
+      nama_produk: product.nama_produk,
+      harga_jual: Number(product.harga_jual),
+      gambar_url: product.gambar_url || "/placeholder.png",
+      quantity: 1 // Default penambahan pertama dari halaman detail
+    });
 
     toast.success("Berhasil!", {
       description: `${product.nama_produk} telah ditambahkan ke keranjang.`,
@@ -162,7 +178,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               {product.deskripsi || "Dapatkan kualitas terbaik dengan penawaran harga eksklusif hanya di Niaga Jaya Electronic."}
             </p>
 
-            {/* 3. LOGIKA SELEKSI MENGGUNAKAN IF-ELSE IF (isSignedIn) */}
+            {/* LOGIKA SELEKSI MENGGUNAKAN IF-ELSE IF (isSignedIn) */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               
               {isSignedIn ? (
@@ -180,7 +196,18 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     <ShoppingCart className="mr-2" size={18} /> {Number(product.stok) === 0 ? "Stok Habis" : "Keranjang"}
                   </Button>
 
-                  <CheckoutDialog product={product} />
+               {/* SISI TOMBOL DETAIL PRODUK */}
+                <CheckoutDialog 
+                  products={[
+                    {
+                      id: product.id,
+                      nama_produk: product.nama_produk,
+                      harga_jual: product.harga_jual,
+                      gambar_url: product.gambar_url || "/placeholder.png",
+                      quantity: 1 // Default beli langsung dari detail page
+                    }
+                  ]} 
+                />
                 </>
               ) : (
                 /* KONDISI USER BELUM LOGIN */

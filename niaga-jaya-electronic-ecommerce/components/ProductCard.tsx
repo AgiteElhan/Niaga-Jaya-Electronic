@@ -62,9 +62,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="group relative bg-white rounded-[28px] border border-slate-100 p-4 hover:shadow-2xl hover:shadow-blue-100 transition-all duration-500 flex flex-col justify-between h-full">
       
-      <Link href={`/product/${product.id}`} className="block flex-1">
-        {/* Kontainer Gambar */}
-        <div className="relative aspect-square bg-slate-50 rounded-[22px] overflow-hidden mb-4">
+        <Link href={`/product/${product.id}`} className="block flex-1">        <div className="relative aspect-square bg-slate-50 rounded-[22px] overflow-hidden mb-4">
           {product.gambar_url || product.gambar ? (
             <img 
               src={displayImage} 
