@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\UlasanController;
 use App\Http\Controllers\Api\ClerkWebhookController;
+use App\Http\Controllers\Api\OrderController;
+
 
 
 
@@ -24,3 +26,11 @@ Route::get('/categories', [App\Http\Controllers\Api\CategoryController::class, '
 Route::get('/products/{productId}/reviews', [UlasanController::class, 'getByProduct']);
 
 Route::post('/clerk-webhook', [ClerkWebhookController::class, 'handleWebhook']);
+
+Route::post('/orders', [OrderController::class, 'store']);
+
+Route::get('/orders/{order_id}', [OrderController::class, 'show']);
+
+Route::get('/orders', [OrderController::class, 'index']);
+
+Route::post('/reviews', [UlasanController::class, 'store']);

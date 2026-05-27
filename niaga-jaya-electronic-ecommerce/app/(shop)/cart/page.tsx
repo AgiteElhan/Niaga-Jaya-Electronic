@@ -222,15 +222,14 @@ const CartPage = () => {
                 </div>
               </div>
 
-              {/* TOMBOL CHECKOUT RESPONSIVE */}
               {itemsToBuy.length > 0 ? (
                 <CheckoutDialog products={itemsToBuy} isFromCart={true} />
               ) : (
                 <Button 
                   disabled
-                  className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-slate-200 text-slate-400 font-bold cursor-not-allowed text-sm sm:text-lg"
+                  className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-slate-100 text-slate-400 font-bold text-sm sm:text-lg border border-slate-200"
                 >
-                  Checkout (0)
+                  Pilih Produk Dulu...
                 </Button>
               )}
               

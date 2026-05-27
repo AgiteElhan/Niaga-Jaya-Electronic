@@ -1,3 +1,5 @@
+"use client";
+
 import type { Metadata } from "next";
 import { Poppins, Figtree } from "next/font/google";
 import "./globals.css";
@@ -6,6 +8,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ClerkProvider } from '@clerk/nextjs'
 import { Toaster } from 'sonner';
+
+// IMPORT SCRIPT DARI NEXT.JS UNTUK MIDTRANS SNAP CDN
+import Script from "next/script";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -18,22 +23,12 @@ const figtree = Figtree({
   variable: "--font-figtree",
 });
 
-export const metadata: Metadata = {
-  title: "Niaga Jaya Electronic",
-  description: "Solusi Elektronik Terpercaya",
-  icons: {
-    icon: "/favicon.png",
-  },
-};
-
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    // PASTE KODE PK_TEST_ LU DI SINI:
     <ClerkProvider publishableKey="pk_test_cG9zc2libGUtbW9sZS05LmNsZXJrLmFjY291bnRzLmRldiQ">
       <html lang="en" className="h-full scroll-smooth">
         <body 
@@ -57,6 +52,13 @@ export default function RootLayout({
           </main>
 
           <Footer />
+
+          {/* KUNCI INTEGRASI: INJECT SCRIPT SNAP MIDTRANS CDN */}
+          <Script
+            src="https://app.sandbox.midtrans.com/snap/snap.js"
+            data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+            strategy="lazyOnload"
+          />
         </body>
       </html>
     </ClerkProvider>

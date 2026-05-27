@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import { 
   CreditCard, MapPin, Truck, Receipt, ArrowRight, Loader2, 
   User, Phone, Home, Building2, Check, ArrowLeft, Smartphone, Landmark
@@ -50,6 +51,7 @@ interface CheckoutDialogProps {
 }
 
 export default function CheckoutDialog({ products = [], isFromCart = false }: CheckoutDialogProps) {
+  const { user } = useUser(); 
   const [selectedShipping, setSelectedShipping] = useState(SHIPPING_OPTIONS[0]);
   const [selectedPayment, setSelectedPayment] = useState(PAYMENT_OPTIONS[0]);
   
@@ -102,7 +104,7 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
     }
   }, [isBuyModalOpen]);
 
-  // Kalkulasi total belanja
+  // Kalkulasi total belanja produk
   const productsSubtotal = products.reduce((total, item) => {
     return total + (Number(item.harga_jual) * item.quantity);
   }, 0);
@@ -151,33 +153,135 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
     }
   };
 
-  const handleMidtransPayment = () => {
+  // INTEGRASI REAL API: LARAVEL + MIDTRANS GATEWAY
+  const handleMidtransPayment = async () => {
     if (!selectedAddressId) {
       return toast.error("Oops!", { description: "Pilih salah satu alamat pengiriman terlebih dahulu." });
     }
 
-    setIsSubmitting(true);
-    toast.info("Menghubungkan ke Midtrans...", { description: `Membuka sandbox secure gateway via ${selectedPayment.name}.` });
+    const currentAddress = addresses.find(a => a.id === selectedAddressId);
+    if (!currentAddress) return;
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsBuyModalOpen(false);
-      toast.success("Pembayaran Berhasil!", {
-        description: `Transaksi Rp ${grandTotal.toLocaleString("id-ID")} sukses via ${selectedPayment.name}.`,
+    // Kunci Order ID unik dari Next.js biar sama di Laravel & Midtrans
+    const generatedOrderId = `NJE-${Date.now()}`;
+
+    try {
+      setIsSubmitting(true);
+      toast.info("Memproses Pesanan...", { description: "Sedang mencatatkan transaksi ke database Supabase." });
+
+      // =========================================================
+      // JALUR A: HIT API LARAVEL UNTUK SIMPAN DATA KE SUPABASE
+      // =========================================================
+      const laravelResponse = await fetch("http://localhost:8000/api/orders", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+      body: JSON.stringify({
+        order_id: generatedOrderId,
+        customer_name: currentAddress.name,
+        customer_phone: currentAddress.phone,
+        clerk_id: user?.id, 
+        shipping_address: `${currentAddress.fullAddress}, ${currentAddress.city}`, 
+        shipping_method: selectedShipping.name, // Mengirim nama kurir ekspedisi (J&T, JNE, dll)
+        grand_total: grandTotal,
+        items: products,
+      }),
       });
-    }, 2500);
+
+      const laravelData = await laravelResponse.json();
+
+      if (!laravelResponse.ok) {
+        throw new Error(laravelData.error || "Gagal mencatatkan pesanan ke database server Laravel.");
+      }
+
+      // =========================================================
+      // JALUR B: MINTA TOKEN SNAP PADA NEXT.JS BACKEND (API ROUTE)
+      // =========================================================
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: generatedOrderId, // Overwrite pake orderId yang sama dengan Laravel
+          products: products,
+          address: {
+            name: currentAddress.name,
+            phone: currentAddress.phone,
+            fullAddress: currentAddress.fullAddress,
+            city: currentAddress.city,
+          },
+          shippingFee: shippingFee,
+          adminFee: adminFee,
+          grandTotal: grandTotal,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Gagal membuat invoice Midtrans");
+      }
+
+      setIsSubmitting(false);
+
+      // =========================================================
+      // JALUR C: LUNCURKAN MODAL POP-UP SNAP MIDTRANS SECURE
+      // =========================================================
+      // @ts-ignore
+      if (window.snap) {
+        // @ts-ignore
+        window.snap.pay(data.token, {
+          onSuccess: function (result: any) {
+            toast.success("Pembayaran Berhasil!", {
+              description: `Terima kasih! Transaksi ${result.order_id} sukses diproses.`,
+            });
+            setIsBuyModalOpen(false);
+          },
+          onPending: function () {
+            toast.info("Menunggu Pembayaran", {
+              description: "Pesanan aman disimpan. Silakan bayar melalui tagihan invoice QRIS Anda.",
+            });
+            setIsBuyModalOpen(false);
+          },
+          onError: function () {
+            toast.error("Pembayaran Gagal", {
+              description: "Transaksi Anda ditolak oleh payment gateway.",
+            });
+          },
+          onClose: function () {
+            toast.warning("Transaksi Ditutup", {
+              description: "Anda membatalkan pengisian invoice pembayaran langsung.",
+            });
+          },
+        });
+      } else {
+        toast.error("Sistem SDK Error", { description: "Gagal memuat modul Snap script di browser." });
+      }
+
+    } catch (error: any) {
+      setIsSubmitting(false);
+      console.error(error);
+      toast.error("Gagal Mengamankan Pesanan", { description: error.message || "Kesalahan jaringan internal backend." });
+    }
   };
 
   return (
     <Dialog open={isBuyModalOpen} onOpenChange={handleModalChange}>
-      <DialogTrigger asChild>
-        {/* Tombol pemicu responsif mengikuti container induk */}
-        <Button className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-lg font-bold shadow-lg shadow-blue-100 flex items-center justify-center gap-2 transition-all active:scale-95">
-          <CreditCard size={18} /> Checkout
-        </Button>
-      </DialogTrigger>
+
+<DialogTrigger asChild>
+  <button 
+    type="button" 
+    style={{ pointerEvents: 'auto', zIndex: 9999 }}
+    className="w-full h-14 bg-blue-600 text-white font-bold rounded-2xl cursor-pointer"
+    onClick={(e) => {
+      console.log("Tombol Checkout diklik!"); // Cek konsol F12!
+    }}
+  >
+    Checkout Sekarang
+  </button>
+</DialogTrigger>
       
-      {/* Container utama dialog responsif max-h agar tidak menembus batas layar bawah HP */}
       <DialogContent className="w-[95%] sm:max-w-[550px] rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 border-none overflow-y-auto max-h-[92vh] sm:max-h-[90vh] shadow-2xl scrollbar-none bg-white">
         <DialogHeader className="border-b border-slate-50 pb-3 sm:pb-4">
           <DialogTitle className="text-base sm:text-xl font-black tracking-tight text-slate-900 text-center">
@@ -190,40 +294,43 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
             {isSubmitting && (
               <div className="absolute inset-0 bg-white/90 z-50 flex flex-col items-center justify-center gap-3 backdrop-blur-sm rounded-xl">
                 <Loader2 className="animate-spin text-blue-600" size={32} />
-                <p className="font-black text-xs sm:text-sm text-slate-900 tracking-tight text-center px-4">Menghubungkan ke Midtrans Secure Sandbox...</p>
+                <p className="font-black text-xs sm:text-sm text-slate-900 tracking-tight text-center px-4">Menghubungkan Aman ke Gateway Server...</p>
               </div>
             )}
 
-            {/* RINCIAN BARANG BELANJAAN MULTI-ITEM RESPONSIVE */}
+            {/* SEKSI RINCIAN BARANG BELANJAAN */}
             <div className="space-y-1.5">
               <div className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest px-0.5">
                 Rincian Barang Belanjaan ({products.length})
               </div>
               
               <div className="space-y-2 max-h-[120px] sm:max-h-[160px] overflow-y-auto pr-1 border border-slate-100 p-2 rounded-xl sm:rounded-2xl bg-slate-50/50 scrollbar-thin">
-                {products.map((item) => (
-                  <div key={item.id} className="bg-white border border-slate-100 p-2 sm:p-3 rounded-xl flex items-center gap-2.5 sm:gap-3.5 shadow-sm">
-                    <div className="w-11 h-11 sm:w-14 sm:h-14 bg-slate-50 border border-slate-100 rounded-lg p-1 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                      <img 
-                        src={item.gambar_url || "/placeholder.png"} 
-                        alt={item.nama_produk} 
-                        className="max-w-full max-h-full object-contain"
-                        onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.png"; }}
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm font-bold text-slate-800 truncate leading-snug">{item.nama_produk}</p>
-                      <div className="flex items-center justify-between mt-0.5 sm:mt-1">
-                        <p className="text-[11px] sm:text-xs text-blue-600 font-black">
-                          Rp {Number(item.harga_jual).toLocaleString("id-ID")}
-                        </p>
-                        <span className="text-[10px] sm:text-xs text-slate-400 font-black bg-slate-100 px-1.5 py-0.5 rounded">
-                          {item.quantity}x
-                        </span>
+                {products.length > 0 ? (
+                  products.map((item) => (
+                    <div key={item.id} className="bg-white border border-slate-100 p-2 sm:p-3 rounded-xl flex items-center gap-2.5 sm:gap-3.5 shadow-sm">
+                      <div className="w-11 h-11 sm:w-14 sm:h-14 bg-slate-50 border border-slate-100 rounded-lg p-1 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                        <img 
+                          src={item.gambar_url || "/placeholder.png"} 
+                          alt={item.nama_produk} 
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm font-bold text-slate-800 truncate leading-snug">{item.nama_produk}</p>
+                        <div className="flex items-center justify-between mt-0.5 sm:mt-1">
+                          <p className="text-[11px] sm:text-xs text-blue-600 font-black">
+                            Rp {Number(item.harga_jual).toLocaleString("id-ID")}
+                          </p>
+                          <span className="text-[10px] sm:text-xs text-slate-400 font-black bg-slate-100 px-1.5 py-0.5 rounded">
+                            {item.quantity}x
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400 text-center py-2">Tidak ada detail produk.</p>
+                )}
               </div>
             </div>
 
@@ -303,7 +410,7 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
               </div>
             </div>
 
-            {/* METODE PEMBAYARAN: GRID RESPONSIVE (1 KOLOM DI HP, 3 KOLOM DI TABLET/PC) */}
+            {/* METODE PEMBAYARAN SIMULASI */}
             <div className="space-y-2">
               <div className="flex items-center gap-1 text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest px-0.5">
                 <CreditCard size={12} className="text-blue-600" /> Metode Pembayaran Midtrans
@@ -330,7 +437,6 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
                         </div>
                       </div>
                       
-                      {/* Tampilan Konten Khusus Desktop */}
                       <div className="hidden sm:block">
                         <p className="text-[10px] font-black text-slate-900 leading-tight">{payment.name}</p>
                         <p className="text-[8px] text-slate-400 font-semibold">{payment.type}</p>
@@ -372,12 +478,13 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
               </div>
             </div>
 
-            {/* TOMBOL AKSI UTAMA DIALOG */}
+            {/* TOMBOL AKSI UTAMA DIALOG DENGAN PROTEKSI SUBMITTING */}
             <div className="flex gap-2.5 pt-1.5">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setIsBuyModalOpen(false)}
+                disabled={isSubmitting}
                 className="flex-1 h-11 sm:h-14 rounded-xl sm:rounded-2xl border border-slate-100 font-bold text-slate-500 hover:bg-slate-50 text-xs uppercase tracking-wider"
               >
                 Batal
@@ -385,15 +492,24 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
               <Button 
                 type="button"
                 onClick={handleMidtransPayment} 
-                className="flex-[2.5] h-11 sm:h-14 rounded-xl sm:rounded-2xl bg-[#132A56] hover:bg-[#1a3870] font-black text-white text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-slate-900/5"
+                disabled={isSubmitting}
+                className="flex-[2.5] h-11 sm:h-14 rounded-xl sm:rounded-2xl bg-[#132A56] hover:bg-[#1a3870] font-black text-white text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-slate-900/5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <CreditCard size={14} /> Buat Pesanan
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin w-4 h-4" /> Memproses DB...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard size={14} /> Buat Pesanan
+                  </>
+                )}
               </Button>
             </div>
           </div>
         )}
 
-        {/* JALUR TAMPILAN B: FORM TAMBAH ALAMAT BARU RESPONSIVE */}
+        {/* JALUR TAMPILAN B: FORM TAMBAH ALAMAT BARU */}
         {addressView === "add" && (
           <form onSubmit={handleSaveNewAddress} className="space-y-3.5 pt-1">
             <div className="space-y-2.5">
