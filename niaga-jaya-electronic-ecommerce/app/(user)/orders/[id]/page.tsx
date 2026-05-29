@@ -12,25 +12,35 @@ import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 
 // Interface disesuaikan 100% dengan hasil map query Laravel dari DB lokal lu
-interface OrderDetail {
-  id: number | string;
-  order_id: string; // nomor_pesanan (NJE-xxxx)
-  status_pesanan: string; // 'menunggu', 'berhasil', 'settlement', dll
-  created_at: string;
-  arrival_date?: string;
-  metode_pembayaran: string;
-  kurir_pengiriman: string; // metode_pengiriman
-  nomor_resi: string;
-  nama_penerima: string; // nama_pembeli
-  nomor_telepon: string; // whatsapp_pembeli
-  alamat_lengkap: string; // alamat_kirim
-  
-  // Detail Produk Terkait (Dari tabel pesanan_item)
+// Tambahkan interface baru ini khusus untuk daftar barang
+interface OrderItem {
   product_id: number | string;
   nama_produk: string;
   gambar_url?: string;
-  harga_jual: number; // harga_satuan
+  harga_jual: number;
+  jumlah: number;
   kategori_produk?: string;
+}
+
+// Ubah interface OrderDetail kamu menjadi seperti ini
+interface OrderDetail {
+  id: number | string;
+  order_id: string; 
+  status_pesanan: string; 
+  created_at: string;
+  arrival_date?: string;
+  metode_pembayaran: string;
+  status_pembayaran: string; // Pastikan ini ada
+  kurir_pengiriman: string; 
+  nomor_resi: string;
+  nama_penerima: string; 
+  nomor_telepon: string; 
+  alamat_lengkap: string; 
+  total_bayar: number; // Tambahkan ini untuk total keseluruhan
+
+  // Hapus variabel produk yang satuan (seperti nama_produk, product_id)
+  // GANTI DENGAN INI:
+  items: OrderItem[]; 
 }
 
 interface OrderDetailPageProps {
@@ -70,6 +80,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
         
         if (response.ok) {
           const result = await response.json();
+          console.log("Data dari API Laravel:", result); // Tambahkan ini!
           setOrder(result.data || result); 
         } else {
           throw new Error("Pesanan tidak ditemukan atau hak akses ditolak.");
@@ -264,59 +275,46 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                 </div>
               </div>
 
-              {/* Card Rincian Barang Riil */}
-              <div className="bg-white border border-slate-100 rounded-[36px] p-6 sm:p-8 space-y-6">
-                <h3 className="font-black text-lg text-slate-900 uppercase tracking-tight flex items-center gap-2 border-b border-slate-50 pb-3">
-                  <Package size={18} className="text-blue-600" /> Rincian Produk
-                </h3>
-                
-                <div className="flex items-center gap-5 sm:gap-6">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 border border-slate-100 p-2.5 rounded-2xl flex items-center justify-center overflow-hidden shrink-0">
-                    {order.gambar_url ? (
-                      <img 
-                        // Tambahkan prefix storage agar Next.js bisa mengambil file dari Laravel
-                        src={`http://localhost:8000/storage/products/${order.gambar_url}`} 
-                        alt={order.nama_produk} 
-                        className="object-contain w-full h-full" 
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-slate-100 rounded flex items-center justify-center text-[10px] font-bold text-slate-400">
-                        No Image
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-slate-800 text-sm sm:text-base line-clamp-2 leading-snug">
-                      {order.nama_produk}
-                    </h4>
-                    {order.kategori_produk && (
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">
-                        {order.kategori_produk}
-                      </p>
-                    )}
-                  </div>
-                  
-                  <div className="text-right shrink-0">
-                    <p className="font-black text-sm sm:text-base text-slate-900">
-                      Rp {Number(order.harga_jual || 0).toLocaleString("id-ID")}
-                    </p>
-                    <p className="text-xs text-slate-400 font-bold">1x Barang</p>
-                  </div>
-                </div>
+              {/* Card Rincian Produk */}
+{/* Ganti blok Card Rincian Produk (mulai dari <h3> sampai penutup <div>-nya) dengan ini: */}
+{/* GANTI BLOK RINCIAN PRODUK DENGAN INI */}
+<div className="bg-white border border-slate-100 rounded-[36px] p-6 sm:p-8 space-y-6">
+  <h3 className="font-black text-lg text-slate-900 uppercase tracking-tight flex items-center gap-2 border-b border-slate-50 pb-3">
+    <Package size={18} className="text-blue-600" /> Rincian Produk
+  </h3>
 
-                <div className="border-t border-slate-100 pt-4 flex justify-between items-center">
-                  <div>
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-wider">Total Pembayaran</p>
-                    <p className="text-xl sm:text-2xl font-black text-blue-600">Rp {Number(order.harga_jual || 0).toLocaleString("id-ID")}</p>
-                  </div>
-                  {order.product_id && (
-                    <Link href={`/product/${order.product_id}`} className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-1.5 transition-all">
-                      <ShoppingBag size={14} /> Beli Lagi
-                    </Link>
-                  )}
-                </div>
-              </div>
+  <div className="space-y-4">
+    {/* Looping semua item yang ada di dalam array 'items' */}
+    {Array.isArray(order.items) && order.items.length > 0 ? (
+      order.items.map((item, index) => (
+        <div key={index} className="flex items-center gap-5 sm:gap-6">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 border border-slate-100 p-2.5 rounded-2xl flex items-center justify-center overflow-hidden shrink-0">
+             <img 
+               src={`http://localhost:8000/storage/products/${item.gambar}`} 
+               alt={item.nama_produk} 
+               className="object-contain w-full h-full" 
+             />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="font-bold text-slate-800 text-sm">{item.nama_produk}</h4>
+          </div>
+          <div className="text-right text-sm font-black">
+            Rp {Number(item.harga_satuan || 0).toLocaleString("id-ID")}
+          </div>
+        </div>
+      ))
+    ) : (
+      <p className="text-center text-slate-400">Produk tidak ditemukan.</p>
+    )}
+  </div>
+
+  <div className="border-t pt-4 text-right">
+    <p className="text-xs text-slate-400 uppercase font-black">Total</p>
+    <p className="text-xl font-black text-blue-600">
+      Rp {Number(order.total_harga || 0).toLocaleString("id-ID")}
+    </p>
+  </div>
+</div>
 
             </div>
 

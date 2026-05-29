@@ -22,7 +22,7 @@ class PesananItem extends Model
         return $this->belongsTo(Pesanan::class, 'pesanan_id');
     }
 
-    public function produk() {
+    public function product() {
         return $this->belongsTo(Product::class, 'produk_id');
     }
 }

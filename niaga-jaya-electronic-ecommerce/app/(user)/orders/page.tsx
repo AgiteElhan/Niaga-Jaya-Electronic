@@ -16,6 +16,8 @@ interface Order {
   created_at: string;
   nama_produk: string;
   gambar_url?: string;
+  items?: any[]; 
+  jumlah_item: number; 
 }
 
 export default function OrdersPage() {
@@ -157,9 +159,17 @@ export default function OrdersPage() {
                           {order.status_pesanan === 'settlement' || order.status_pesanan === 'success' ? 'Berhasil' : order.status_pesanan}
                         </span>
                       </div>
+                      
+                      {/* LOGIKA MENAMPILKAN NAMA PRODUK */}
                       <p className="text-slate-700 text-xs sm:text-sm font-bold truncate pr-4">
                         {order.nama_produk}
+                        {order.jumlah_item > 1 && (
+                          <span className="text-blue-600 font-medium ml-1">
+                            + {order.jumlah_item - 1} barang lainnya
+                          </span>
+                        )}
                       </p>
+
                       <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                         <Clock size={11} className="text-slate-300" />
                         <span>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
+import { useCartStore } from "@/store/useCartStore";
 import { 
   CreditCard, MapPin, Truck, Receipt, ArrowRight, Loader2, 
   User, Phone, Home, Building2, Check, ArrowLeft, Smartphone, Landmark
@@ -52,6 +53,7 @@ interface CheckoutDialogProps {
 
 export default function CheckoutDialog({ products = [], isFromCart = false }: CheckoutDialogProps) {
   const { user } = useUser(); 
+  const { removeFromCart } = useCartStore(); // <--- TAMBAHKAN BARIS INI
   const [selectedShipping, setSelectedShipping] = useState(SHIPPING_OPTIONS[0]);
   const [selectedPayment, setSelectedPayment] = useState(PAYMENT_OPTIONS[0]);
   
@@ -217,6 +219,7 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
         }),
       });
 
+     // ... (kode sebelumnya)
       const data = await response.json();
 
       if (!response.ok) {
@@ -226,40 +229,57 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
       setIsSubmitting(false);
 
       // =========================================================
-      // JALUR C: LUNCURKAN MODAL POP-UP SNAP MIDTRANS SECURE
+      // SOLUSI: TUTUP DIALOG NEXT.JS DULU SEBELUM BUKA MIDTRANS
       // =========================================================
-      // @ts-ignore
-      if (window.snap) {
-        // @ts-ignore
-        window.snap.pay(data.token, {
-          onSuccess: function (result: any) {
-            toast.success("Pembayaran Berhasil!", {
-              description: `Terima kasih! Transaksi ${result.order_id} sukses diproses.`,
-            });
-            setIsBuyModalOpen(false);
-          },
-          onPending: function () {
-            toast.info("Menunggu Pembayaran", {
-              description: "Pesanan aman disimpan. Silakan bayar melalui tagihan invoice QRIS Anda.",
-            });
-            setIsBuyModalOpen(false);
-          },
-          onError: function () {
-            toast.error("Pembayaran Gagal", {
-              description: "Transaksi Anda ditolak oleh payment gateway.",
-            });
-          },
-          onClose: function () {
-            toast.warning("Transaksi Ditutup", {
-              description: "Anda membatalkan pengisian invoice pembayaran langsung.",
-            });
-          },
+      setIsBuyModalOpen(false); 
+
+      // =========================================================
+      // FITUR BARU: HAPUS BARANG DARI KERANJANG
+      // =========================================================
+      if (isFromCart) {
+        products.forEach((product) => {
+          removeFromCart(Number(product.id)); // <-- Tambahkan Number() di sini
         });
-      } else {
-        toast.error("Sistem SDK Error", { description: "Gagal memuat modul Snap script di browser." });
       }
 
+      // Beri jeda 1 detik agar pelindung layar Next.js benar-benar hilang, baru buka Midtrans
+      // Beri jeda 1 detik agar pelindung layar Next.js benar-benar hilang, baru buka Midtrans
+      setTimeout(() => {
+        // 1. Akali TypeScript dengan mengubah window menjadi 'any'
+        const snapWindow = window as any;
+
+        if (snapWindow.snap) {
+          snapWindow.snap.pay(data.token, {
+            // 2. Matikan peringatan linter khusus untuk baris ini
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onSuccess: function (result: any) {
+              toast.success("Pembayaran Berhasil!", {
+                description: `Terima kasih! Transaksi ${result.order_id} sukses diproses.`,
+              });
+            },
+            onPending: function () {
+              toast.info("Menunggu Pembayaran", {
+                description: "Pesanan aman disimpan. Silakan bayar melalui tagihan invoice QRIS Anda.",
+              });
+            },
+            onError: function () {
+              toast.error("Pembayaran Gagal", {
+                description: "Transaksi Anda ditolak oleh payment gateway.",
+              });
+            },
+            onClose: function () {
+              toast.warning("Transaksi Ditutup", {
+                description: "Anda membatalkan pengisian invoice pembayaran langsung.",
+              });
+            },
+          });
+        } else {
+          toast.error("Sistem SDK Error", { description: "Gagal memuat modul Snap script di browser." });
+        }
+      }, 1000); // Waktu jeda 1 detik
+
     } catch (error: any) {
+    // ... (sisa kode error catch biarkan sama){
       setIsSubmitting(false);
       console.error(error);
       toast.error("Gagal Mengamankan Pesanan", { description: error.message || "Kesalahan jaringan internal backend." });

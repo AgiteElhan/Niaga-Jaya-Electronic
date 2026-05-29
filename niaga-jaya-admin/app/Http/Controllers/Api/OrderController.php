@@ -23,8 +23,9 @@ class OrderController extends Controller
                 ->get();
 
             $data = $pesananUser->map(function($order) {
-                // FIX: Gunakan JOIN agar nama dan gambar diambil langsung dari tabel 'product'
-                // Ini memastikan data yang diambil adalah data yang SESUNGGUHNYA di tabel product
+                $jumlahItem = DB::table('pesanan_item')->where('pesanan_id', $order->id)->count();
+                
+                // Ambil satu item utama untuk ditampilkan
                 $item = DB::table('pesanan_item')
                     ->leftJoin('product', 'pesanan_item.produk_id', '=', 'product.id')
                     ->select('product.nama_produk', 'product.gambar')
@@ -35,12 +36,11 @@ class OrderController extends Controller
                     'id' => $order->id,
                     'order_id' => $order->nomor_pesanan,
                     'status_pesanan' => $order->status_pembayaran ?? 'menunggu',
-                    'metode_pembayaran' => $order->metode_pembayaran ?? '-',
                     'total_harga' => $order->total_bayar ?? 0,
                     'created_at' => $order->created_at,
-                    // FIX: Jika JOIN gagal atau data kosong, baru tampilkan default
                     'nama_produk' => $item->nama_produk ?? 'Produk Tidak Ditemukan',
-                    'gambar_url' => $item->gambar ?? null
+                    'gambar_url' => $item->gambar ?? null,
+                    'jumlah_item' => $jumlahItem // Tambahkan ini agar bisa dipakai di frontend
                 ];
             });
 
@@ -51,48 +51,45 @@ class OrderController extends Controller
         }
     }
         
-public function show(Request $request, $order_id)
-{
-    $clerkId = $request->query('clerk_id');
+    public function show(Request $request, $order_id)
+    {
+        $clerkId = $request->query('clerk_id');
 
-    // 1. Ambil data pesanan
-    $order = DB::table('pesanan')
-        ->where('nomor_pesanan', $order_id) 
-        ->where('clerk_id', $clerkId)
-        ->first();
+        // 1. Ambil data pesanan
+        $order = DB::table('pesanan')
+            ->where('nomor_pesanan', $order_id) 
+            ->where('clerk_id', $clerkId)
+            ->first();
 
-    if (!$order) {
-        return response()->json(['error' => 'Pesanan tidak ditemukan'], 404);
+        if (!$order) {
+            return response()->json(['error' => 'Pesanan tidak ditemukan'], 404);
+        }
+
+        // 2. AMBIL SEMUA PRODUK (Gunakan ->get(), BUKAN ->first())
+        $items = DB::table('pesanan_item')
+            ->join('product', 'pesanan_item.produk_id', '=', 'product.id')
+            ->select('pesanan_item.*', 'product.nama_produk', 'product.gambar')
+            ->where('pesanan_item.pesanan_id', $order->id)
+            ->get(); // <--- GANTI JADI ->get()
+
+        return response()->json([
+            'id' => $order->id,
+            'order_id' => $order->nomor_pesanan,
+            'status_pesanan' => $order->status_pembayaran ?? 'menunggu',
+            'created_at' => $order->created_at,
+            'metode_pembayaran' => $order->metode_pembayaran ?? '-',
+            'kurir_pengiriman' => $order->metode_pengiriman ?? '-',
+            'nomor_resi' => 'Belum tersedia',
+            'nama_penerima' => $order->nama_pembeli,
+            'nomor_telepon' => $order->whatsapp_pembeli,
+            'alamat_lengkap' => $order->alamat_kirim,
+            
+            // 3. KIRIM SEMUA ITEM SEBAGAI ARRAY
+            'items' => $items, 
+            
+            'total_harga' => $order->total_bayar ?? 0,
+        ], 200);
     }
-
-    // 2. Ambil detail produk dengan JOIN agar nama dan gambar terambil dari tabel 'product'
-    $item = DB::table('pesanan_item')
-        ->join('product', 'pesanan_item.produk_id', '=', 'product.id')
-        ->select('pesanan_item.*', 'product.nama_produk', 'product.gambar')
-        ->where('pesanan_item.pesanan_id', $order->id)
-        ->first();
-
-    return response()->json([
-        'id' => $order->id,
-        'order_id' => $order->nomor_pesanan,
-        'status_pesanan' => $order->status_pembayaran ?? 'menunggu',
-        'created_at' => $order->created_at,
-        'metode_pembayaran' => $order->metode_pembayaran ?? '-',
-        'kurir_pengiriman' => $order->metode_pengiriman ?? '-',
-        'nomor_resi' => 'Belum tersedia',
-        'nama_penerima' => $order->nama_pembeli,
-        'nomor_telepon' => $order->whatsapp_pembeli,
-        'alamat_lengkap' => $order->alamat_kirim,
-        'product_id' => $item->produk_id ?? null,
-        // Nama produk sekarang diambil dari tabel 'product' hasil join
-        'nama_produk' => $item->nama_produk ?? 'Produk Tidak Ditemukan',
-        'harga_jual' => $item->harga_satuan ?? 0,
-        'total_harga' => $order->total_bayar ?? 0,
-        // Gambar sekarang diambil langsung dari hasil join
-        'gambar_url' => $item->gambar ?? null,
-        'metode_pembayaran' => $order->metode_pembayaran ?? 'Midtrans',
-    ], 200);
-}
    public function store(Request $request)
 {
     // 1. Validasi semua field yang wajib ada di database 'pesanan'

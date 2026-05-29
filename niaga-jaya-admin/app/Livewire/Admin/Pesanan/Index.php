@@ -6,6 +6,8 @@ use App\Models\Pesanan;
 use App\Models\PesananItem;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 
 class Index extends Component
@@ -28,6 +30,8 @@ class Index extends Component
 	public $harga_satuan;	
 	public $subtotal;
 
+    public $selectedOrder; 
+
     public $delete_id;
     public $id_pesanan;
     public $id_pesanan_item;
@@ -43,6 +47,39 @@ class Index extends Component
         'nama_pembeli'                  => 'required',
         'nomor_pesanan'                 => 'required',
     ];
+
+
+    public function viewOrder($id)
+    {
+        // Menggunakan Eager Loading agar data items dan product ikut terbawa
+        $this->selectedOrder = Pesanan::with(['items.product'])->find($id);
+        
+        // Memberitahu browser untuk menampilkan modal (asumsi menggunakan JS standar)
+        $this->dispatch('show-order-modal'); 
+    }
+    public function exportPdf()
+    {
+        // 1. Ambil data pesanan beserta relasi item dan produk
+        // Kita gunakan 'latest()' agar yang terbaru muncul di atas
+        $pesananData = \App\Models\Pesanan::with(['items.product'])
+            ->where(function ($query) {
+                $query->where('nama_pembeli', 'like', '%' . $this->search . '%')
+                    ->orWhere('nomor_pesanan', 'like', '%' . $this->search . '%');
+            })
+            ->latest()
+            ->get();
+
+        // 2. Load view laporan (Anda bisa membuat file baru: resources/views/pdf/laporan-pesanan.blade.php)
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.laporan_pesanan', [
+            'pesananData' => $pesananData
+        ])->setPaper('a4', 'portrait');
+
+        // 3. Stream download
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, 'Laporan_Pesanan_Niaga_Jaya_' . date('Ymd_His') . '.pdf');
+    }
+
 
     public function updatingSearch()
     {

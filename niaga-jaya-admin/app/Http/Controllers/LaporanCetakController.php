@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\StokMasuk;
 use App\Models\StokMasukItems;
+use App\Models\Pesanan;
+use App\Models\PesananItem;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class LaporanCetakController extends Controller
@@ -34,5 +36,17 @@ class LaporanCetakController extends Controller
                   
         // Stream hasilnya ke browser agar siap diprint
         return $pdf->stream('Nota_Stok_Masuk_' . $stok->nomor_referensi . '.pdf');
+    }
+
+    public function cetakInvoice($id)
+    {
+        // Ambil data pesanan beserta relasi item dan produknya
+        $order = Pesanan::with(['items.product'])->findOrFail($id);
+
+        // Load view PDF yang sudah kita buat tadi
+        $pdf = Pdf::loadView('pdf.invoice_pesanan_detail', ['order' => $order])
+                  ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Invoice-' . $order->nomor_pesanan . '.pdf');
     }
 }
