@@ -5,24 +5,24 @@ import Container from "@/components/ui/Container";
 import Link from "next/link";
 import { 
   ArrowLeft, Package, Truck, MapPin, CreditCard, 
-  MessageSquare, ShieldAlert, ShoppingBag, Star, Send, CheckCircle2, Lock 
+  MessageSquare, ShieldAlert, CheckCircle2, Lock, Star, Send
 } from "lucide-react";
 import { useUser, SignInButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 
-// Interface disesuaikan 100% dengan hasil map query Laravel dari DB lokal lu
-// Tambahkan interface baru ini khusus untuk daftar barang
+// --- INTERFACES ---
 interface OrderItem {
   product_id: number | string;
   nama_produk: string;
   gambar_url?: string;
+  gambar?: string; // Tambahan untuk antisipasi nama field gambar dari backend
   harga_jual: number;
+  harga_satuan?: number; // Tambahan untuk antisipasi nama field harga dari backend
   jumlah: number;
   kategori_produk?: string;
 }
 
-// Ubah interface OrderDetail kamu menjadi seperti ini
 interface OrderDetail {
   id: number | string;
   order_id: string; 
@@ -30,16 +30,14 @@ interface OrderDetail {
   created_at: string;
   arrival_date?: string;
   metode_pembayaran: string;
-  status_pembayaran: string; // Pastikan ini ada
+  status_pembayaran: string; 
   kurir_pengiriman: string; 
   nomor_resi: string;
   nama_penerima: string; 
   nomor_telepon: string; 
   alamat_lengkap: string; 
-  total_bayar: number; // Tambahkan ini untuk total keseluruhan
-
-  // Hapus variabel produk yang satuan (seperti nama_produk, product_id)
-  // GANTI DENGAN INI:
+  total_bayar: number; 
+  total_harga?: number;
   items: OrderItem[]; 
 }
 
@@ -59,9 +57,10 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
 
   // State untuk form ulasan
   const [productRating, setProductRating] = useState(0);
-  const [courierRating, setCourierRating] = useState(0);
+  const [courierRating, setCourierRating] = useState(0); // Tetap ada di UI, walau backend belum pakai
   const [reviewComment, setReviewComment] = useState("");
   const [isReviewed, setIsReviewed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Hydration fix
   useEffect(() => {
@@ -78,13 +77,19 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
         
         const response = await fetch(`${BACKEND_URL}/api/orders/${orderIdFromUrl}?clerk_id=${user.id}`);
         
-        if (response.ok) {
-          const result = await response.json();
-          console.log("Data dari API Laravel:", result); // Tambahkan ini!
-          setOrder(result.data || result); 
-        } else {
-          throw new Error("Pesanan tidak ditemukan atau hak akses ditolak.");
+       if (response.ok) {
+        const result = await response.json();
+        console.log("Data dari API Laravel:", result); 
+        
+        const orderData = result.data || result;
+        setOrder(orderData); 
+        
+        // TAMBAHKAN LOGIKA INI:
+        // Jika dari database terdeteksi sudah di-review, otomatis sembunyikan form
+        if (orderData.is_reviewed) {
+          setIsReviewed(true);
         }
+      }
       } catch (error) {
         console.error("Error fetching order detail:", error);
       } finally {
@@ -92,59 +97,83 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
       }
     };
 
-  if (isLoaded && isSignedIn) {
-    fetchOrderDetail();
-  } else if (isLoaded && !isSignedIn) {
-    setLoading(false);
-  }
-}, [isLoaded, isSignedIn, user?.id, orderIdFromUrl]);
+    if (isLoaded && isSignedIn) {
+      fetchOrderDetail();
+    } else if (isLoaded && !isSignedIn) {
+      setLoading(false);
+    }
+  }, [isLoaded, isSignedIn, user?.id, orderIdFromUrl]);
 
-  // Fungsi Kirim Review Ke Backend Laravel
+  // FUNGSI KIRIM REVIEW KE BACKEND LARAVEL
   const handleSendReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (productRating === 0 || courierRating === 0) {
-      return toast.error("Mohon berikan rating produk dan kurir!");
+    if (productRating === 0) {
+      return toast.error("Mohon berikan rating produk!");
     }
     
+    setIsSubmitting(true);
+
     try {
       const BACKEND_URL = "http://localhost:8000";
+      const payload = {
+        pesanan_id: order?.id,
+        
+        // UBAH BARIS INI: Tambahkan order.items[0].produk_id sebagai cadangan
+        produk_id: order?.items && order.items.length > 0 ? (order.items[0].product_id || order.items[0].produk_id || order.items[0].id) : null,
+        
+        nama_pembeli: order?.nama_penerima || "Pelanggan",
+        rating: productRating, 
+        komentar: reviewComment
+      };
+
+      console.log("Payload Review yang dikirim:", payload);
+
       const response = await fetch(`${BACKEND_URL}/api/reviews`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clerk_id: user?.id,
-          product_id: order?.product_id,
-          order_id: order?.id,
-          rating_produk: productRating,
-          rating_kurir: courierRating,
-          komentar: reviewComment
-        })
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(payload)
       });
+
+      const data = await response.json();
 
       if (response.ok) {
         toast.success("Ulasan Anda berhasil dikirim! Terima kasih.");
         setIsReviewed(true);
+        setReviewComment("");
+        setProductRating(0);
+        setCourierRating(0);
       } else {
-        toast.error("Gagal mengirim ulasan.");
+        console.error("Server Error Detail:", data);
+        toast.error("Gagal mengirim: " + (data.message || "Pastikan semua data terisi"));
       }
     } catch (error) {
       console.error("Error sending review:", error);
+      toast.error("Terjadi kesalahan koneksi ke server.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const openWhatsApp = (type: "seller" | "warranty") => {
     if (!order) return;
     const phoneNumber = "6281319946436"; 
+    
+    // Ambil nama produk pertama untuk pesan WA
+    const firstProductName = order.items && order.items.length > 0 ? order.items[0].nama_produk : "Produk";
+
     const text = type === "seller" 
       ? `Halo Admin Niaga Jaya, saya ingin bertanya tentang Nomor Pesanan *${order.order_id}*`
-      : `Halo Admin Niaga Jaya, saya ingin mengajukan klaim garansi/komplain untuk Nomor Pesanan *${order.order_id}* dengan produk *${order.nama_produk}*`;
+      : `Halo Admin Niaga Jaya, saya ingin mengajukan klaim garansi/komplain untuk Nomor Pesanan *${order.order_id}* dengan produk *${firstProductName}*`;
     
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
-      case "tiba": case "selesai": case "success": case "settlement": 
+      case "tiba": case "selesai": case "success": case "settlement": case "berhasil":
         return "bg-green-100 text-green-700 border-green-200";
       case "dikirim": 
         return "bg-blue-100 text-blue-700 border-blue-200";
@@ -169,7 +198,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
             Detail Pesanan Terkunci
           </h1>
           <p className="text-slate-500 text-sm leading-relaxed mb-8 font-medium">
-            Untuk melihat detail pelacakan logistik log ini, silakan masuk ke akun Anda terlebih dahulu.
+            Untuk melihat detail pelacakan logistik, silakan masuk ke akun Anda terlebih dahulu.
           </p>
           <SignInButton mode="modal">
             <Button className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-base font-bold shadow-lg shadow-blue-100 flex items-center justify-center gap-2 transition-all active:scale-95">
@@ -193,7 +222,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
 
   if (!order) return <div className="py-20 text-center font-bold text-red-500">Detail Pesanan Tidak Ditemukan</div>;
 
-  const isOrderArrived = order.status_pesanan?.toLowerCase() === "tiba" || order.status_pesanan?.toLowerCase() === "selesai";
+  const isOrderArrived = order.status_pesanan?.toLowerCase() === "tiba" || order.status_pesanan?.toLowerCase() === "selesai" || order.status_pesanan?.toLowerCase() === "berhasil" || order.status_pesanan?.toLowerCase() === "success";
 
   return (
     <div className="bg-slate-50 min-h-screen py-10">
@@ -233,14 +262,10 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
           </div>
 
           {/* GRID DETAIL */}
-          <div className={`grid grid-cols-1 gap-8 items-start ${
-            isOrderArrived ? "lg:grid-cols-3" : "lg:grid-cols-1"
-          }`}>
+          <div className={`grid grid-cols-1 gap-8 items-start ${isOrderArrived ? "lg:grid-cols-3" : "lg:grid-cols-1"}`}>
             
             {/* KIRI: LOGISTIK & ALAMAT */}
-            <div className={`space-y-8 ${
-              isOrderArrived ? "lg:col-span-2" : "lg:col-span-1"
-            }`}>
+            <div className={`space-y-8 ${isOrderArrived ? "lg:col-span-2" : "lg:col-span-1"}`}>
               
               {/* Card Alamat Penerima Riil */}
               <div className="bg-white border border-slate-100 rounded-[36px] p-6 sm:p-8 space-y-4">
@@ -263,7 +288,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                   <div className="text-sm font-bold text-slate-700">
                     <p>{order.kurir_pengiriman || "Regular Delivery"}</p>
                     <p className="text-xs text-slate-400 font-medium mt-1">
-                      No. Resi: {order.nomor_resi || "Menunggu konfirmasi kurir admin"}
+                      No. Resi: {order.nomor_resi || "Menunggu konfirmasi kurir"}
                     </p>
                   </div>
                 </div>
@@ -271,54 +296,53 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                   <h4 className="font-black text-sm text-slate-400 uppercase tracking-wider flex items-center gap-2">
                     <CreditCard size={16} className="text-blue-600" /> Metode Pembayaran
                   </h4>
-                  <p className="text-sm font-bold text-slate-700">{order.metode_pembayaran}</p>
+                  <p className="text-sm font-bold text-slate-700">{order.metode_pembayaran || "Transfer Bank"}</p>
                 </div>
               </div>
 
               {/* Card Rincian Produk */}
-{/* Ganti blok Card Rincian Produk (mulai dari <h3> sampai penutup <div>-nya) dengan ini: */}
-{/* GANTI BLOK RINCIAN PRODUK DENGAN INI */}
-<div className="bg-white border border-slate-100 rounded-[36px] p-6 sm:p-8 space-y-6">
-  <h3 className="font-black text-lg text-slate-900 uppercase tracking-tight flex items-center gap-2 border-b border-slate-50 pb-3">
-    <Package size={18} className="text-blue-600" /> Rincian Produk
-  </h3>
+              <div className="bg-white border border-slate-100 rounded-[36px] p-6 sm:p-8 space-y-6">
+                <h3 className="font-black text-lg text-slate-900 uppercase tracking-tight flex items-center gap-2 border-b border-slate-50 pb-3">
+                  <Package size={18} className="text-blue-600" /> Rincian Produk
+                </h3>
 
-  <div className="space-y-4">
-    {/* Looping semua item yang ada di dalam array 'items' */}
-    {Array.isArray(order.items) && order.items.length > 0 ? (
-      order.items.map((item, index) => (
-        <div key={index} className="flex items-center gap-5 sm:gap-6">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 border border-slate-100 p-2.5 rounded-2xl flex items-center justify-center overflow-hidden shrink-0">
-             <img 
-               src={`http://localhost:8000/storage/products/${item.gambar}`} 
-               alt={item.nama_produk} 
-               className="object-contain w-full h-full" 
-             />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="font-bold text-slate-800 text-sm">{item.nama_produk}</h4>
-          </div>
-          <div className="text-right text-sm font-black">
-            Rp {Number(item.harga_satuan || 0).toLocaleString("id-ID")}
-          </div>
-        </div>
-      ))
-    ) : (
-      <p className="text-center text-slate-400">Produk tidak ditemukan.</p>
-    )}
-  </div>
+                <div className="space-y-4">
+                  {Array.isArray(order.items) && order.items.length > 0 ? (
+                    order.items.map((item, index) => (
+                      <div key={index} className="flex items-center gap-5 sm:gap-6">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 border border-slate-100 p-2.5 rounded-2xl flex items-center justify-center overflow-hidden shrink-0">
+                           <img 
+                             src={item.gambar_url || (item.gambar ? `http://localhost:8000/storage/products/${item.gambar}` : "/placeholder.png")} 
+                             alt={item.nama_produk} 
+                             className="object-contain w-full h-full" 
+                             onError={(e) => { e.currentTarget.src = "/placeholder.png"; }}
+                           />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-slate-800 text-sm">{item.nama_produk}</h4>
+                          <p className="text-xs text-slate-500 mt-1">{item.jumlah}x</p>
+                        </div>
+                        <div className="text-right text-sm font-black">
+                          Rp {Number(item.harga_satuan || item.harga_jual || 0).toLocaleString("id-ID")}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center text-slate-400 font-medium">Produk tidak ditemukan.</p>
+                  )}
+                </div>
 
-  <div className="border-t pt-4 text-right">
-    <p className="text-xs text-slate-400 uppercase font-black">Total</p>
-    <p className="text-xl font-black text-blue-600">
-      Rp {Number(order.total_harga || 0).toLocaleString("id-ID")}
-    </p>
-  </div>
-</div>
+                <div className="border-t pt-4 text-right">
+                  <p className="text-xs text-slate-400 uppercase font-black">Total Keseluruhan</p>
+                  <p className="text-xl font-black text-blue-600">
+                    Rp {Number(order.total_bayar || order.total_harga || 0).toLocaleString("id-ID")}
+                  </p>
+                </div>
+              </div>
 
             </div>
 
-            {/* KANAN: FORM REVIEWS ASLI (AKTIF JIKA STATUSNYA TIBA/SELESAI) */}
+            {/* KANAN: FORM REVIEWS */}
             {isOrderArrived && (
               <div className="lg:col-span-1">
                 <div className="bg-slate-900 text-white border border-slate-800 rounded-[36px] p-6 sm:p-8 shadow-2xl sticky top-10">
@@ -326,26 +350,26 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                     <form onSubmit={handleSendReview} className="space-y-6">
                       <div>
                         <h3 className="font-black text-xl tracking-tight">Beri Ulasan</h3>
-                        <p className="text-xs text-slate-400 mt-1 font-medium">Pesanan Anda telah tiba. Bagikan pengalaman Anda!</p>
+                        <p className="text-xs text-slate-400 mt-1 font-medium">Bagikan pengalaman Anda!</p>
                       </div>
 
                       <div className="space-y-2">
                         <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Kualitas Produk</label>
                         <div className="flex gap-2">
                           {[1, 2, 3, 4, 5].map((star) => (
-                            <button key={star} type="button" onClick={() => setProductRating(star)} className="focus:outline-none">
-                              <Star size={24} fill={productRating >= star ? '#eab308' : 'none'} color={productRating >= star ? "#eab308" : "#475569"} strokeWidth={2} />
+                            <button key={star} type="button" onClick={() => setProductRating(star)} className="focus:outline-none transition-transform active:scale-90">
+                              <Star size={28} fill={productRating >= star ? '#eab308' : 'none'} color={productRating >= star ? "#eab308" : "#475569"} strokeWidth={2} />
                             </button>
                           ))}
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Pelayanan Kurir</label>
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Pelayanan Kurir (Opsional)</label>
                         <div className="flex gap-2">
                           {[1, 2, 3, 4, 5].map((star) => (
-                            <button key={star} type="button" onClick={() => setCourierRating(star)} className="focus:outline-none">
-                              <Star size={24} fill={courierRating >= star ? '#eab308' : 'none'} color={courierRating >= star ? "#eab308" : "#475569"} strokeWidth={2} />
+                            <button key={star} type="button" onClick={() => setCourierRating(star)} className="focus:outline-none transition-transform active:scale-90">
+                              <Star size={28} fill={courierRating >= star ? '#3b82f6' : 'none'} color={courierRating >= star ? "#3b82f6" : "#475569"} strokeWidth={2} />
                             </button>
                           ))}
                         </div>
@@ -356,24 +380,28 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                         <textarea
                           value={reviewComment}
                           onChange={(e) => setReviewComment(e.target.value)}
-                          placeholder="Tulis ulasan produk dan kurir disini..."
+                          placeholder="Tulis kualitas produk disini..."
                           className="w-full bg-slate-800 border-none rounded-2xl p-4 text-white focus:ring-2 focus:ring-blue-500 outline-none h-24 text-sm resize-none placeholder:text-slate-600"
                           required
                         />
                       </div>
 
-                      <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all">
-                        Kirim Ulasan <Send size={14} />
-                      </button>
+                      <Button 
+                        type="submit" 
+                        disabled={isSubmitting || productRating === 0}
+                        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                      >
+                        {isSubmitting ? "Mengirim..." : "Kirim Ulasan"} <Send size={16} />
+                      </Button>
                     </form>
                   ) : (
                     <div className="text-center py-10 space-y-4">
-                      <div className="w-16 h-16 bg-blue-600/20 text-blue-400 rounded-full flex items-center justify-center mx-auto">
-                        <CheckCircle2 size={36} />
+                      <div className="w-20 h-20 bg-blue-600/20 text-blue-400 rounded-full flex items-center justify-center mx-auto">
+                        <CheckCircle2 size={40} />
                       </div>
                       <div>
-                        <h4 className="font-black text-lg">Ulasan Terkirim</h4>
-                        <p className="text-xs text-slate-400 mt-1 font-medium">Terima kasih telah memberikan penilaian di Niaga Jaya Official!</p>
+                        <h4 className="font-black text-xl">Ulasan Terkirim</h4>
+                        <p className="text-sm text-slate-400 mt-2 font-medium">Terima kasih telah memberikan penilaian di Niaga Jaya Electronic!</p>
                       </div>
                     </div>
                   )}
@@ -382,7 +410,6 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
             )}
 
           </div>
-
         </div>
       </Container>
     </div>

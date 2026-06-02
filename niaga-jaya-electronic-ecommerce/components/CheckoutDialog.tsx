@@ -430,49 +430,6 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
               </div>
             </div>
 
-            {/* METODE PEMBAYARAN SIMULASI */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-1 text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest px-0.5">
-                <CreditCard size={12} className="text-blue-600" /> Metode Pembayaran Midtrans
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2">
-                {PAYMENT_OPTIONS.map((payment) => {
-                  const IconComponent = payment.icon;
-                  return (
-                    <button
-                      key={payment.id}
-                      type="button"
-                      onClick={() => setSelectedPayment(payment)}
-                      className={`p-2.5 sm:p-3 rounded-xl border text-left flex sm:flex-col justify-between items-center sm:items-start h-auto sm:h-[75px] transition-all relative ${
-                        selectedPayment.id === payment.id
-                          ? "border-blue-600 bg-blue-50/40 ring-1 ring-blue-600"
-                          : "border-slate-100 bg-white hover:bg-slate-50"
-                      }`}
-                    >
-                      <div className="flex items-center sm:items-start gap-2.5 sm:gap-0 sm:w-full sm:flex justify-between">
-                        <IconComponent size={14} className={selectedPayment.id === payment.id ? "text-blue-600" : "text-slate-400"} />
-                        <div className="sm:hidden">
-                          <p className="text-xs font-black text-slate-900 leading-tight">{payment.name}</p>
-                          <p className="text-[9px] text-slate-400 font-semibold">{payment.type}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="hidden sm:block">
-                        <p className="text-[10px] font-black text-slate-900 leading-tight">{payment.name}</p>
-                        <p className="text-[8px] text-slate-400 font-semibold">{payment.type}</p>
-                      </div>
-
-                      <div className="shrink-0">
-                        {selectedPayment.id === payment.id && (
-                          <Check size={10} className="bg-blue-600 text-white rounded-full p-0.5" strokeWidth={4} />
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
             {/* RINCIAN RINGKASAN PEMBAYARAN */}
             <div className="space-y-1.5 border-t border-slate-100 pt-2.5">
               <div className="flex items-center gap-1 text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest mb-0.5">

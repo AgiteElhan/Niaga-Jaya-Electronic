@@ -41,9 +41,8 @@ export default function HeroSection() {
               Semua Keluarga
             </p>
             <a
-              href={`https://wa.me/${phone}?text=Halo%20Niaga%20Jaya%2C%20saya%20ingin%20melakukan%20pemesanan`}
+              href="http://localhost:3000/" 
               target="_blank"
-              rel="noopener noreferrer"
               className="inline-block bg-[#2563EB] hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-full shadow-lg transition-all active:scale-95"
             >
               Beli Sekarang

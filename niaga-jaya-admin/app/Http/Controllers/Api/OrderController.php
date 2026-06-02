@@ -52,44 +52,53 @@ class OrderController extends Controller
     }
         
     public function show(Request $request, $order_id)
-    {
-        $clerkId = $request->query('clerk_id');
+{
+    $clerkId = $request->query('clerk_id');
 
-        // 1. Ambil data pesanan
-        $order = DB::table('pesanan')
-            ->where('nomor_pesanan', $order_id) 
-            ->where('clerk_id', $clerkId)
-            ->first();
+    // 1. Ambil data pesanan
+    $order = DB::table('pesanan')
+        ->where('nomor_pesanan', $order_id) 
+        ->where('clerk_id', $clerkId)
+        ->first();
 
-        if (!$order) {
-            return response()->json(['error' => 'Pesanan tidak ditemukan'], 404);
-        }
-
-        // 2. AMBIL SEMUA PRODUK (Gunakan ->get(), BUKAN ->first())
-        $items = DB::table('pesanan_item')
-            ->join('product', 'pesanan_item.produk_id', '=', 'product.id')
-            ->select('pesanan_item.*', 'product.nama_produk', 'product.gambar')
-            ->where('pesanan_item.pesanan_id', $order->id)
-            ->get(); // <--- GANTI JADI ->get()
-
-        return response()->json([
-            'id' => $order->id,
-            'order_id' => $order->nomor_pesanan,
-            'status_pesanan' => $order->status_pembayaran ?? 'menunggu',
-            'created_at' => $order->created_at,
-            'metode_pembayaran' => $order->metode_pembayaran ?? '-',
-            'kurir_pengiriman' => $order->metode_pengiriman ?? '-',
-            'nomor_resi' => 'Belum tersedia',
-            'nama_penerima' => $order->nama_pembeli,
-            'nomor_telepon' => $order->whatsapp_pembeli,
-            'alamat_lengkap' => $order->alamat_kirim,
-            
-            // 3. KIRIM SEMUA ITEM SEBAGAI ARRAY
-            'items' => $items, 
-            
-            'total_harga' => $order->total_bayar ?? 0,
-        ], 200);
+    if (!$order) {
+        return response()->json(['error' => 'Pesanan tidak ditemukan'], 404);
     }
+
+    // 2. AMBIL SEMUA PRODUK (Gunakan ->get(), BUKAN ->first())
+    $items = DB::table('pesanan_item')
+        ->join('product', 'pesanan_item.produk_id', '=', 'product.id')
+        ->select('pesanan_item.*', 'product.nama_produk', 'product.gambar')
+        ->where('pesanan_item.pesanan_id', $order->id)
+        ->get(); // <--- GANTI JADI ->get()
+
+    // 3. CEK APAKAH ULASAN SUDAH ADA UNTUK PESANAN INI
+    // (Menggunakan DB::table agar selaras dengan gaya kodingan Anda di atas)
+    $isReviewed = DB::table('ulasan')
+        ->where('pesanan_id', $order->id)
+        ->exists();
+
+    return response()->json([
+        'id' => $order->id,
+        'order_id' => $order->nomor_pesanan,
+        'status_pesanan' => $order->status_pembayaran ?? 'menunggu',
+        'created_at' => $order->created_at,
+        'metode_pembayaran' => $order->metode_pembayaran ?? '-',
+        'kurir_pengiriman' => $order->metode_pengiriman ?? '-',
+        'nomor_resi' => 'Belum tersedia',
+        'nama_penerima' => $order->nama_pembeli,
+        'nomor_telepon' => $order->whatsapp_pembeli,
+        'alamat_lengkap' => $order->alamat_kirim,
+        
+        // 4. KIRIM SEMUA ITEM SEBAGAI ARRAY
+        'items' => $items, 
+        
+        'total_harga' => $order->total_bayar ?? 0,
+
+        // 5. STATUS ULASAN DIKIRIM KE REACT
+        'is_reviewed' => $isReviewed,
+    ], 200);
+}
    public function store(Request $request)
 {
     // 1. Validasi semua field yang wajib ada di database 'pesanan'

@@ -5,43 +5,66 @@ import { Star, Send } from "lucide-react";
 import { Button } from "./ui/button";
 
 interface AddReviewFormProps {
-  productId?: string; // Untuk tahu produk mana yang sedang diulas
-  onSuccess?: () => void; // Fungsi opsional jika mau menutup modal/pindah halaman setelah sukses kirim
+  order: any;             // Menerima objek order dari page.tsx
+  productId?: string;     // ID produk yang diulas
+  onSuccess?: () => void;
 }
 
-export default function AddReviewForm({ productId, onSuccess }: AddReviewFormProps) {
+export default function AddReviewForm({ order, productId, onSuccess }: AddReviewFormProps) {
   const [userRating, setUserRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmitReview = (e: React.FormEvent) => {
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (userRating === 0) return alert("Pilih rating terlebih dahulu!");
 
-    // Di sini nanti tempat kamu melakukan Axios / Fetch POST ke API Laravel Niaga Jaya
-    console.log("Mengirim data ke backend:", {
-      productId,
-      rating: userRating,
-      comment: comment
-    });
+    setIsSubmitting(true);
 
-    // Simulasi Berhasil Kirim API
-    alert("Terima kasih! Ulasan Anda berhasil dikirim.");
-    
-    // Reset form
-    setComment("");
-    setUserRating(0);
+    try {
+      const response = await fetch("http://localhost:8000/api/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          pesanan_id: order.id,         // Data dari prop order
+          produk_id: productId,         // Data dari prop productId
+          nama_pembeli: order.nama_pembeli || "Pelanggan", // Dinamis dari data order
+          rating: userRating,
+          komentar: comment,
+        }),
+      });
 
-    // Jalankan fungsi callback sukses jika ada (misal buat nutup modal)
-    if (onSuccess) onSuccess();
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Terima kasih! Ulasan Anda berhasil dikirim.");
+        setComment("");
+        setUserRating(0);
+        if (onSuccess) onSuccess();
+      } else {
+        // Menampilkan error spesifik dari Laravel (misal: validasi gagal)
+        console.error("Server Error:", data);
+        alert("Gagal: " + (data.message || JSON.stringify(data.errors || "Terjadi kesalahan")));
+      }
+    } catch (error) {
+      console.error("Error Detail:", error);
+      alert("Terjadi kesalahan koneksi ke server.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="bg-slate-900 rounded-[40px] p-10 text-white shadow-2xl shadow-blue-900/20 w-full max-w-3xl mx-auto font-sans">
       <h4 className="text-2xl font-black mb-2 tracking-tight">Berikan Ulasan Anda</h4>
-      <p className="text-slate-400 mb-8 font-medium">Bagikan pengalamanmu menggunakan produk ini setelah pembelian selesai.</p>
+      <p className="text-slate-400 mb-8 font-medium">Bagikan pengalamanmu menggunakan produk ini.</p>
       
       <form onSubmit={handleSubmitReview} className="space-y-8">
+        {/* Rating Area */}
         <div className="flex flex-col gap-4">
           <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Skor Produk</p>
           <div className="flex gap-3">
@@ -59,26 +82,27 @@ export default function AddReviewForm({ productId, onSuccess }: AddReviewFormPro
                   fill={(hover || userRating) >= star ? "#eab308" : "none"} 
                   color={(hover || userRating) >= star ? "#eab308" : "#334155"}
                   strokeWidth={2.5}
-                  className="transition-transform active:scale-90"
                 />
               </button>
             ))}
           </div>
         </div>
 
+        {/* Comment Area */}
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="Bagaimana kualitas produk secara keseluruhan? Tulis di sini..."
-          className="w-full bg-slate-800 border-none rounded-[24px] p-6 text-white focus:ring-4 focus:ring-blue-600/30 outline-none h-32 resize-none placeholder:text-slate-600 font-medium"
+          placeholder="Tulis ulasan Anda di sini..."
+          className="w-full bg-slate-800 border-none rounded-[24px] p-6 text-white focus:ring-4 focus:ring-blue-600/30 outline-none h-32 resize-none"
           required
         />
 
         <Button 
-          disabled={userRating === 0} 
-          className="bg-blue-600 hover:bg-blue-500 text-white font-black w-full md:w-auto px-12 h-16 rounded-[24px] transition-all text-lg"
+          type="submit"
+          disabled={userRating === 0 || isSubmitting} 
+          className="bg-blue-600 hover:bg-blue-500 w-full md:w-auto px-12 h-16 rounded-[24px]"
         >
-          Kirim Ulasan <Send size={20} className="ml-3" />
+          {isSubmitting ? "Mengirim..." : "Kirim Ulasan"} <Send size={20} className="ml-3" />
         </Button>
       </form>
     </div>

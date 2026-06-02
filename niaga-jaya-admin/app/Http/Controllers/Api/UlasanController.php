@@ -9,32 +9,27 @@ use App\Models\Ulasan;
 
 class UlasanController extends Controller
 {
-
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'pesanan_id' => 'required', // Ini adalah ID dari tabel pesanan
-            'product_id' => 'required',
-            'nama_pembeli' => 'required|string', // Sesuai kolom nama_pembeli
+            'pesanan_id' => 'required',
+            'produk_id' => 'required',
+            'nama_pembeli' => 'required|string',
             'rating' => 'required|integer|min:1|max:5',
             'komentar' => 'nullable|string'
         ]);
 
-        try {
-            DB::table('ulasan')->insert([
-                'pesanan_id' => $validated['pesanan_id'],
-                'produk_id'  => $validated['product_id'],
-                'nama_pembeli' => $validated['nama_pembeli'],
-                'rating'     => $validated['rating'],
-                'komentar'   => $validated['komentar'],
-                'tampilkan'  => 1, // Default tampil
-                'created_at' => now(),
-            ]);
+        // Menggunakan Model (pastikan kolom ada di $fillable di model Ulasan)
+        Ulasan::create([
+            'pesanan_id'   => $validated['pesanan_id'],
+            'produk_id'    => $validated['produk_id'],
+            'nama_pembeli' => $validated['nama_pembeli'],
+            'rating'       => $validated['rating'],
+            'komentar'     => $validated['komentar'],
+            'tampilkan'    => 1,
+        ]);
 
-            return response()->json(['message' => 'Ulasan berhasil disimpan'], 201);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        return response()->json(['message' => 'Ulasan berhasil disimpan'], 201);
     }
     public function getByProduct($productId)
     {

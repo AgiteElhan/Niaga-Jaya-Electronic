@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\UlasanController;
 use App\Http\Controllers\Api\ClerkWebhookController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\MidtransController;
 
 
 
@@ -34,3 +35,7 @@ Route::get('/orders/{order_id}', [OrderController::class, 'show']);
 Route::get('/orders', [OrderController::class, 'index']);
 
 Route::post('/reviews', [UlasanController::class, 'store']);
+
+Route::post('/midtrans-callback', [MidtransController::class, 'callback']);
+
+
