@@ -475,5 +475,65 @@ document.addEventListener('livewire:init', () => {
                   icon: "success"
               })
           })
-
       })
+// alert Update Status Pengiriman
+document.addEventListener('livewire:init', () => {
+
+    // Event untuk membuka modal
+    Livewire.on('openUpdateStatusModal', () => {
+        const modal = new bootstrap.Modal(document.getElementById('modalUpdateStatus'))
+        modal.show()
+    })
+
+    // Event untuk menutup modal
+    Livewire.on('closeUpdateStatusModal', () => {
+        const modalEl = document.getElementById('modalUpdateStatus')
+        const modal = bootstrap.Modal.getInstance(modalEl) // Gunakan getInstance
+
+        // 1. Tutup modal Bootstrap
+        if(modal) {
+            modal.hide()
+        }
+
+        // 2. PERBAIKAN: Hapus paksa backdrop (layar hitam) yang nyangkut
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        
+        // 3. PERBAIKAN: Buka kembali kuncian scroll pada body
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+
+        // 4. Reset isi form
+        if(modalEl.querySelector('form')) {
+            modalEl.querySelector('form').reset()
+        }
+
+        // 5. Tampilkan SweetAlert
+        Swal.fire({
+            title: "Berhasil!",
+            text: "Berhasil Mengupdate Status Pengiriman",
+            icon: "success"
+        })
+    })
+})
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Cari elemen modal berdasarkan ID-nya
+    const myModalEl = document.getElementById('modalUpdateStatus');
+    
+    if (myModalEl) {
+        // 'hidden.bs.modal' adalah event otomatis dari Bootstrap saat modal benar-benar selesai ditutup
+        myModalEl.addEventListener('hidden.bs.modal', event => {
+            
+            // 1. Bersihkan semua sisa layar hitam (backdrop) yang nyangkut
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            
+            // 2. Buka kembali kuncian scroll pada halaman
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+    }
+});
+      

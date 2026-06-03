@@ -10,8 +10,6 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\MidtransController;
 
 
-
-
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -38,4 +36,5 @@ Route::post('/reviews', [UlasanController::class, 'store']);
 
 Route::post('/midtrans-callback', [MidtransController::class, 'callback']);
 
-
+Route::post('/orders/{id}/receive', [OrderController::class, 'receiveOrder']);
+Route::get('/filters', [ProductController::class, 'getFilters']);

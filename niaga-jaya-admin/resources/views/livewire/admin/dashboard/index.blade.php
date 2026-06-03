@@ -145,329 +145,131 @@
         </div>
     </div>
       <div class="row g-3 mb-3">
-        <div class="col-12 col-lg-6">
-          <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center bg-transparent px-4 py-3">
-              <h3 class="h5 mb-0">Sales vs Purchase</h3>
-              <div>
-                <select class="form-select form-select-sm">
-                  <option selected>This Year</option>
-                  <option>This Month</option>
-                  <option>This Week</option>
-                </select>
-              </div>
-            </div>
-            <div class="card-body p-4">
-
-              <div id="salesPurchaseChart"></div>
-            </div>
-          </div>
-        </div>
-
-
-        <div class="col-12 col-lg-6">
-          <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center bg-transparent px-4 py-3">
-              <h3 class="h5 mb-0">Overall Information</h3>
-              <div>
-                <select class="form-select form-select-sm">
-                  <option selected>Last 6 Months</option>
-                  <option>This Month</option>
-                  <option>This Week</option>
-                </select>
-              </div>
-            </div>
-            <div class="card-body p-4">
-              <h3 class="h6">Customers Overview</h3>
-              <div class="row align-items-center">
-                <div class="col-sm-6">
-                  <div id="customerChart">
-
+          <div class="col-12 col-lg-6">
+              <div class="card h-100">
+                  <div class="card-header bg-white d-flex justify-content-between align-items-center px-4 py-3">
+                      <h3 class="h5 mb-0">Penjualan vs Pembelian</h3>
                   </div>
-                </div>
-                <div class="col-sm-6">
-                  <div class="row">
-                    <div class="col-6 border-end">
-                      <div class="text-center ">
-                        <h2 class="mb-1">5.5K</h2>
-                        <p class="text-success mb-2">First Time</p>
-                        <span class="badge bg-success"><i class="ti ti-arrow-up-left me-1"></i>25%</span>
-                      </div>
-                    </div>
-                    <div class="col-6">
-                      <div class="text-center">
-                        <h2 class="mb-1">3.5K</h2>
-                        <p class="text-warning mb-2">Return</p>
-                        <span class="badge bg-success badge-xs d-inline-flex align-items-center"><i
-                            class="ti ti-arrow-up-left me-1"></i>21%</span>
-                      </div>
-                    </div>
+                  <div class="card-body p-4">
+                      <div id="salesPurchaseChart" style="min-height: 350px;"></div>
                   </div>
-                </div>
-
-
               </div>
-              <div class="row text-center border-top mt-4 pt-4">
-                <div class="col-4 border-end">
-                  <h3 class="fw-bold mb-2">6987</h3>
-                  <small class="text-secondary">Suppliers</small>
-                </div>
-                <div class="col-4 border-end">
-                  <h3 class="fw-bold mb-2">4896</h3>
-                  <small class="text-secondary">Customers</small>
-                </div>
-                <div class="col-4">
-                  <h3 class="fw-bold mb-2">487</h3>
-                  <small class="text-secondary">Orders</small>
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
+
+          <div class="col-12 col-lg-6">
+              <div class="card h-100">
+                  <div class="card-header bg-white d-flex justify-content-between align-items-center px-4 py-3">
+                      <h3 class="h5 mb-0">Informasi Keseluruhan</h3>
+                  </div>
+                  <div class="card-body p-4">
+                      <h3 class="h6">Gambaran Pelanggan</h3>
+                      <div class="row align-items-center">
+                          <div class="col-sm-6">
+                              <div id="customerChart"></div>
+                          </div>
+                          <div class="col-sm-6">
+                              <div class="row text-center">
+                                  <div class="col-6 border-end">
+                                      <h2 class="mb-1">5.5K</h2>
+                                      <p class="text-success mb-0 small">Pelanggan Baru</p>
+                                  </div>
+                                  <div class="col-6">
+                                      <h2 class="mb-1">3.5K</h2>
+                                      <p class="text-warning mb-0 small">Pelanggan Tetap</p>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row text-center border-top mt-4 pt-4">
+                          <div class="col-4 border-end">
+                              <h3 class="fw-bold mb-2">6987</h3>
+                              <small class="text-secondary">Supplier</small>
+                          </div>
+                          <div class="col-4 border-end">
+                              <h3 class="fw-bold mb-2">{{ \App\Models\Pesanan::count() }}</h3>
+                              <small class="text-secondary">Pelanggan</small>
+                          </div>
+                          <div class="col-4">
+                              <h3 class="fw-bold mb-2">{{ \App\Models\Pesanan::count() }}</h3>
+                              <small class="text-secondary">Pesanan</small>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
       </div>
       <div class="row g-3">
-
-        <!-- CARD 1 — Top Selling Products -->
         <div class="col-lg-4">
-          <div class="card  h-100">
+          <div class="card h-100">
             <div class="card-header bg-white d-flex justify-content-between align-items-center px-4 py-3">
-              <h4 class="mb-0 h5">Top Selling Products</h4>
-              <button class="btn btn-sm btn-outline-secondary">
-                <i class="ti ti-calendar"></i> Today
-              </button>
+              <h4 class="mb-0 h5">Produk Terlaris</h4>
             </div>
-
             <ul class="list-group list-group-flush">
-
-              <!-- item -->
+              @forelse($topProducts ?? collect() as $item)
               <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-2.png" class="rounded" width="48">
+                <img src="{{ asset('storage/products/'.($item->product->gambar ?? 'default.png')) }}" class="rounded" width="48" height="48" style="object-fit:cover">
                 <div class="flex-grow-1">
-                  <p class="mb-1">Wireless Earphones</p>
-                  <div class="d-flex align-items-center gap-2 text-muted">
-                    <small class="fw-semibold">$89 </small>
-                    <small>•</small>
-                    <small>1,250 Units</small>
-                  </div>
+                  <p class="mb-1 fw-bold">{{ $item->product->nama_produk ?? 'Produk Tidak Ditemukan' }}</p>
+                  <small class="text-muted">{{ $item->total_terjual }} Terjual</small>
                 </div>
-                <span class="badge bg-danger-subtle text-danger border border-danger">18%</span>
               </li>
-
-              <!-- repeat -->
-              <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-1.png" class="rounded" width="48">
-                <div class="flex-grow-1">
-                  <p class="mb-1">Gaming Joy Stick</p>
-                  <div class="d-flex align-items-center gap-2 text-muted">
-                    <small class="fw-semibold">$49 </small>
-                    <small>•</small>
-                    <small>5,420 Units</small>
-                  </div>
-
-                </div>
-                <span class="badge bg-primary-subtle text-primary border border-primary">32%</span>
-              </li>
-
-              <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-3.png" class="rounded" width="48">
-                <div class="flex-grow-1">
-                  <p class="mb-1">Smart Watch Pro</p>
-                  <div class="d-flex align-items-center gap-2 text-muted">
-                    <small class="fw-semibold">$98 </small>
-                    <small>•</small>
-                    <small>862 Units</small>
-                  </div>
-
-                </div>
-                <span class="badge bg-info-subtle text-info border border-info">22%</span>
-              </li>
-              <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-4.png" class="rounded" width="48">
-                <div class="flex-grow-1">
-                  <p class="mb-1">USB-C Fast Charger</p>
-                  <div class="d-flex align-items-center gap-2 text-muted">
-                    <small class="fw-semibold">$35 </small>
-                    <small>•</small>
-                    <small>3,200 Units</small>
-                  </div>
-
-                </div>
-                <span class="badge bg-success-subtle text-success border border-success">28%</span>
-              </li>
-              <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-5.png" class="rounded" width="48">
-                <div class="flex-grow-1">
-                  <p class="mb-1">Portable Bluetooth Speaker</p>
-                  <div class="d-flex align-items-center gap-2 text-muted">
-                    <small class="fw-semibold">$65 </small>
-                    <small>•</small>
-                    <small>2,890 Units</small>
-                  </div>
-
-                </div>
-                <span class="badge bg-warning-subtle text-warning border border-warning">25%</span>
-              </li>
+              @empty
+              <li class="list-group-item text-center text-muted">Belum ada data penjualan</li>
+              @endforelse
             </ul>
           </div>
         </div>
 
-        <!-- CARD 2 — Low Stock Products -->
         <div class="col-lg-4">
-          <div class="card  h-100">
+          <div class="card h-100">
             <div class="card-header bg-white d-flex justify-content-between align-items-center px-4 py-3">
-              <div class="d-flex align-items-center">
-
-                <h4 class="mb-0 h5">Low Stock Products</h4>
-              </div>
-              <a href="#" class="small text-primary text-decoration-underline">View All</a>
+              <h4 class="mb-0 h5">Stok Menipis</h4>
+              <a href="{{ route('admin.product') }}" class="small text-primary text-decoration-underline">Lihat Semua</a>
             </div>
-
             <ul class="list-group list-group-flush">
-
+              @forelse($lowStock ?? collect() as $prod)
               <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-8.png" class="rounded" width="48">
+                <img src="{{ asset('storage/products/'.($prod->gambar ?? 'default.png')) }}" class="rounded" width="48" height="48" style="object-fit:cover">
                 <div class="flex-grow-1">
-                  <p class="mb-1">Wireless Headphones</p>
-                  <small>ID: #554433</small>
+                  <p class="mb-1 fw-bold">{{ $prod->nama_produk }}</p>
+                  <small>ID: #{{ $prod->kode_produk }}</small>
                 </div>
-                <div class="d-flex flex-column gap-0 align-items-center">
-                  <span class="fw-semibold text-primary">06</span>
-                  <small class="text-muted">In Stock</small>
+                <div class="d-flex flex-column align-items-center">
+                  <span class="fw-semibold {{ $prod->stok == 0 ? 'text-danger' : 'text-primary' }}">{{ $prod->stok }}</span>
+                  <small class="text-muted">Stok</small>
                 </div>
               </li>
-
-              <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-4.png" class="rounded" width="48">
-                <div class="flex-grow-1">
-                  <p class="mb-1">USB-C Cable Pack</p>
-                  <small>ID: #887766</small>
-                </div>
-                <div class="d-flex flex-column gap-0 align-items-center">
-                  <span class="fw-semibold text-primary">09</span>
-                  <small class="text-muted">In Stock</small>
-                </div>
-              </li>
-
-              <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-10.png" class="rounded" width="48">
-                <div class="flex-grow-1">
-                  <p class="mb-1">Phone Screen Protector</p>
-                  <small>ID: #332211</small>
-                </div>
-                <div class="d-flex flex-column gap-0 align-items-center">
-                  <span class="fw-semibold text-primary">03</span>
-                  <small class="text-muted">In Stock</small>
-                </div>
-              </li>
-              <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-4.png" class="rounded" width="48">
-                <div class="flex-grow-1">
-                  <p class="mb-1">Portable Charger 20000mAh</p>
-                  <small>ID: #998877</small>
-                </div>
-                <div class="d-flex flex-column gap-0 align-items-center">
-                  <span class="fw-semibold text-primary">07</span>
-                  <small class="text-muted">In Stock</small>
-                </div>
-              </li>
-              <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-6.png" class="rounded" width="48">
-                <div class="flex-grow-1">
-                  <p class="mb-1">Mechanical Keyboard RGB</p>
-                  <small>ID: #665544</small>
-                </div>
-                <div class="d-flex flex-column gap-0 align-items-center">
-                  <span class="fw-semibold text-primary">02</span>
-                  <small class="text-muted">In Stock</small>
-                </div>
-              </li>
+              @empty
+              <li class="list-group-item text-center text-muted">Stok aman</li>
+              @endforelse
             </ul>
           </div>
         </div>
 
-        <!-- CARD 3 — Recent Sales -->
         <div class="col-lg-4">
-          <div class="card  h-100">
+          <div class="card h-100">
             <div class="card-header bg-white d-flex justify-content-between align-items-center px-4 py-3">
-              <h4 class="mb-0 h5">Recent Sales</h4>
-              <button class="btn btn-sm btn-outline-secondary">
-                <i class="ti ti-calendar-event"></i> Weekly
-              </button>
+              <h4 class="mb-0 h5">Penjualan Terbaru</h4>
             </div>
-
             <ul class="list-group list-group-flush">
-
+              @forelse($recentSales ?? collect() as $sale)
               <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-7.png" class="rounded" width="48">
                 <div class="flex-grow-1">
-                  <p class="mb-1">MacBook Pro 16"</p>
-                  <div class="d-flex align-items-center gap-2 text-muted">
-                    <small class="fw-semibold">Computers </small>
-                    <small>•</small>
-                    <small>2,$2,499</small>
-                  </div>
-
+                  <p class="mb-1 fw-bold">{{ $sale->nomor_pesanan }}</p>
+                  <small class="text-muted">{{ $sale->nama_pembeli }} • Rp {{ number_format($sale->total_bayar, 0, ',', '.') }}</small>
                 </div>
-                <span class="badge bg-success-subtle text-success">Completed</span>
+                <span class="badge 
+                    {{ $sale->status_pengiriman == 'selesai' ? 'bg-success-subtle text-success' : 
+                      ($sale->status_pengiriman == 'dikirim' ? 'bg-primary-subtle text-primary' : 'bg-warning-subtle text-warning') }}">
+                    {{ ucfirst($sale->status_pengiriman) }}
+                </span>
               </li>
-
-              <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-9.png" class="rounded" width="48">
-                <div class="flex-grow-1">
-                  <p class="mb-1">AirPods Pro Max</p>
-                  <div class="d-flex align-items-center gap-2 text-muted">
-                    <small class="fw-semibold">Audio </small>
-                    <small>•</small>
-                    <small>$549</small>
-                  </div>
-
-                </div>
-                <span class="badge bg-primary-subtle text-primary">Processing</span>
-              </li>
-
-              <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-8.png" class="rounded" width="48">
-                <div class="flex-grow-1">
-                  <p class="mb-1">iPad Air 11"</p>
-                  <div class="d-flex align-items-center gap-2 text-muted">
-                    <small class="fw-semibold">Tablets </small>
-                    <small>•</small>
-                    <small>$799</small>
-                  </div>
-                </div>
-                <span class="badge bg-success-subtle text-success">Completed</span>
-              </li>
-
-              <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-3.png" class="rounded" width="48">
-                <div class="flex-grow-1">
-                  <p class="mb-1">Apple Watch Ultra</p>
-                  <div class="d-flex align-items-center gap-2 text-muted">
-                    <small class="fw-semibold">Wearables </small>
-                    <small>•</small>
-                    <small>$799</small>
-                  </div>
-                </div>
-                <span class="badge bg-warning-subtle text-warning">Pending</span>
-              </li>
-
-              <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="./assets/images/product-6.png" class="rounded" width="48">
-                <div class="flex-grow-1">
-                  <p class="mb-1">Magic Keyboard</p>
-                  <div class="d-flex align-items-center gap-2 text-muted">
-                    <small class="fw-semibold">Accessories </small>
-                    <small>•</small>
-                    <small>$299</small>
-                  </div>
-
-                </div>
-                <span class="badge bg-danger-subtle text-danger">Cancelled</span>
-              </li>
+              @empty
+              <li class="list-group-item text-center text-muted">Belum ada transaksi</li>
+              @endforelse
             </ul>
           </div>
         </div>
-
       </div>
     </div>
 </div>
@@ -490,4 +292,29 @@
   // Jalankan setiap detik
   setInterval(updateClock, 1000);
   updateClock(); // Panggil langsung agar tidak menunggu 1 detik pertama
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Grafik Penjualan (Sales vs Purchase)
+    var options = {
+        series: [{ name: 'Penjualan', data: {!! $salesChart ?? '[]' !!} }],
+        chart: { type: 'bar', height: 350, toolbar: { show: false } },
+        colors: ['#0d6efd'],
+        plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
+        xaxis: { categories: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'] }
+    };
+    new ApexCharts(document.querySelector("#salesPurchaseChart"), options).render();
+
+    // Grafik Pelanggan (Customer Overview)
+    var custOptions = {
+        series: [70, 30],
+        chart: { type: 'donut', height: 250 },
+        labels: ['Baru', 'Tetap'],
+        colors: ['#198754', '#ffc107']
+    };
+    new ApexCharts(document.querySelector("#customerChart"), custOptions).render();
+});
 </script>

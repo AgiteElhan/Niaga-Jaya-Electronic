@@ -3,23 +3,53 @@
 namespace App\Livewire\Admin\Dashboard;
 
 use Livewire\Component;
+use App\Models\Pesanan;
+use App\Models\PesananItem;
+use App\Models\Product;
+use App\Models\StokMasuk;
+use App\Models\StokMasukItem;
+use Illuminate\Support\Facades\DB;
 
 class Index extends Component
 {
     public function render()
     {
-        $totalPenjualan = \App\Models\Pesanan::where('status_pembayaran', 'success')->sum('total_bayar');
+        // Data yang sudah ada (jangan diubah)
 
-        $totalPurchaseCount = \App\Models\StokMasuk::count();
+        $totalPenjualan = Pesanan::where('status_pengiriman', 'selesai')->sum('total_bayar');
+        $totalPurchaseCount = StokMasuk::count();
+        $stokMenipis = Product::where('stok', '<', 10)->count();
+        $totalProduk = Product::count();
+        $totalProfit = Pesanan::where('status_pengiriman', 'selesai')->sum('total_bayar');
+        $totalReturns = Pesanan::where('status_pembayaran', 'failed')->count();
+        $totalItemsSold = StokMasukItem::sum('jumlah_masuk');
 
-        $stokMenipis = \App\Models\Product::where('stok', '<', 10)->count();
+        // Data untuk 3 Card UI (Menggunakan collect() untuk mencegah error null)
+        $topProducts = PesananItem::select('produk_id', DB::raw('sum(jumlah) as total_terjual'))
+            ->groupBy('produk_id')
+            ->orderBy('total_terjual', 'desc')
+            ->limit(5)
+            ->with('product')
+            ->get();
 
-        $totalProduk = \App\Models\Product::count();
-        $totalProfit = \App\Models\Pesanan::where('status_pembayaran', 'success')->sum('total_bayar');
+        $lowStock = Product::where('stok', '<', 10)
+            ->orderBy('stok', 'asc')
+            ->limit(5)
+            ->get();
 
-        $totalReturns = \App\Models\Pesanan::where('status_pembayaran', 'failed')->count();
+        $recentSales = Pesanan::latest()
+            ->limit(5)
+            ->get();
 
-        $totalItemsSold = \App\Models\StokMasukItem::sum('jumlah_masuk'); // Contoh alternatif data pengeluaran
+        $salesData = \App\Models\Pesanan::selectRaw('MONTH(created_at) as month, SUM(total_bayar) as total')
+            ->whereYear('created_at', date('Y'))
+            ->groupBy('month')
+            ->pluck('total', 'month')->toArray();
+
+        $salesChart = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $salesChart[] = $salesData[$i] ?? 0;
+        }
 
         return view('livewire.admin.dashboard.index', [
             'totalProfit' => $totalProfit,
@@ -29,25 +59,10 @@ class Index extends Component
             'totalPurchaseCount' => $totalPurchaseCount,
             'stokMenipis' => $stokMenipis,
             'totalProduk' => $totalProduk,
+            'topProducts' => $topProducts,
+            'lowStock' => $lowStock,
+            'recentSales' => $recentSales,
+            'salesChart' => json_encode($salesChart),
         ]);
     }
-    // public function render()
-    // {
-    //     // 1. Total Penjualan (Sum dari kolom total_bayar di tabel pesanan)
-    //     $totalPenjualan = \App\Models\Pesanan::where('status_pembayaran', 'success')->sum('total_bayar');
-
-    //     // 2. Total Purchase (Menghitung stok masuk - Anda bisa menyesuaikan logic biayanya)
-    //     // Jika tidak ada kolom harga beli di stok_masuk, kita bisa hitung total transaksi stok masuk
-    //     $totalPurchaseCount = \App\Models\StokMasuk::count();
-
-    //     // 3. Stok Menipis (Contoh: Mengambil jumlah produk yang stoknya < 10)
-    //     $stokMenipis = \App\Models\Product::where('stok', '<', 10)->count();
-
-    //     // 4. Total Produk (Menghitung semua jenis produk di gudang)
-    //     $totalProduk = \App\Models\Product::count();
-
-    //     return view('livewire.admin.dashboard.index', [
-            
-    //     ]);
-    // }
 }

@@ -18,7 +18,7 @@
         .judul-dokumen { text-align: center; font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; text-decoration: underline; }
         
         .meta-table { width: 100%; margin-bottom: 20px; }
-        .meta-table td { font-size: 11px; padding: 2px 0; }
+        .meta-table td { font-size: 11px; padding: 4px 0; }
 
         .table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .table th, .table td { border: 1px solid #000; padding: 8px; }
@@ -51,13 +51,23 @@
 
     <table class="meta-table">
         <tr>
-            <td width="15%">No. Pesanan</td><td width="2%">:</td><td>{{ $order->nomor_pesanan }}</td>
-            <td width="15%">Pelanggan</td><td width="2%">:</td><td>{{ $order->nama_pembeli }}</td>
+            <td width="15%">No. Pesanan</td><td width="2%">:</td><td width="33%">{{ $order->nomor_pesanan }}</td>
+            <td width="15%">Pelanggan</td><td width="2%">:</td><td width="33%">{{ $order->nama_pembeli }}</td>
         </tr>
         <tr>
             <td>Tanggal</td><td>:</td><td>{{ \Carbon\Carbon::parse($order->created_at)->format('d F Y') }}</td>
             <td>WhatsApp</td><td>:</td><td>{{ $order->whatsapp_pembeli }}</td>
         </tr>
+        <tr>
+            <td>Status Bayar</td><td>:</td><td>{{ ucfirst($order->status_pembayaran) }}</td>
+            <td>Pengiriman</td><td>:</td><td>{{ ucfirst($order->status_pengiriman ?? 'Menunggu') }}</td>
+        </tr>
+        
+        @if(isset($order->status_pengiriman) && $order->status_pengiriman === 'dikirim')
+        <tr>
+            <td>Nomor Resi</td><td>:</td><td class="fw-bold">{{ $order->nomor_resi ?? '-' }}</td>
+            <td colspan="3"></td> </tr>
+        @endif
     </table>
 
     <table class="table">

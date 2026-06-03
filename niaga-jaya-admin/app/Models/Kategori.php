@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Product;
 
 class Kategori extends Model
 {
@@ -12,4 +13,8 @@ class Kategori extends Model
         'nama_kategori',
         'deskripsi',
     ];
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'merk_id');
+    }
 }

@@ -16,10 +16,36 @@
                             <tr><td class="text-muted">WhatsApp</td><td>:</td><td>{{ $selectedOrder->whatsapp_pembeli }}</td></tr>
                         </table>
                     </div>
+                    
                     <div class="col-md-6">
                         <table class="table table-borderless table-sm">
-                            <tr><td width="120" class="text-muted">Status</td><td>:</td><td><span class="badge bg-info">{{ ucfirst($selectedOrder->status_pembayaran) }}</span></td></tr>
-                            <tr><td class="text-muted">Total</td><td>:</td><td class="fw-bold text-primary">Rp {{ number_format($selectedOrder->total_bayar, 0, ',', '.') }}</td></tr>
+                            <tr>
+                                <td width="120" class="text-muted">Status Bayar</td>
+                                <td>:</td>
+                                <td><span class="badge bg-info">{{ ucfirst($selectedOrder->status_pembayaran) }}</span></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="text-muted">Pengiriman</td>
+                                <td>:</td>
+                                <td>
+                                    <span class="badge bg-warning">{{ ucfirst($selectedOrder->status_pengiriman ?? 'Menunggu') }}</span>
+                                </td>
+                            </tr>
+
+                            @if(isset($selectedOrder->status_pengiriman) && $selectedOrder->status_pengiriman === 'dikirim')
+                            <tr>
+                                <td class="text-muted">Nomor Resi</td>
+                                <td>:</td>
+                                <td class="fw-bold text-success">{{ $selectedOrder->nomor_resi ?? '-' }}</td>
+                            </tr>
+                            @endif
+                            
+                            <tr>
+                                <td class="text-muted">Total</td>
+                                <td>:</td>
+                                <td class="fw-bold text-primary">Rp {{ number_format($selectedOrder->total_bayar, 0, ',', '.') }}</td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -38,8 +64,8 @@
                         <tbody>
                             @foreach($selectedOrder->items as $item)
                             <tr>
-{{-- Ubah baris 41 menjadi seperti ini --}}
-<td>{{ $item->product->nama_produk ?? 'Produk Tidak Ditemukan' }}</td>                                <td class="text-center">{{ $item->jumlah }}</td>
+                                <td>{{ $item->product->nama_produk ?? 'Produk Tidak Ditemukan' }}</td>
+                                <td class="text-center">{{ $item->jumlah }}</td>
                                 <td class="text-end">Rp {{ number_format($item->harga_satuan, 0, ',', '.') }}</td>
                                 <td class="text-end">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
                             </tr>
@@ -59,10 +85,8 @@
                 <a href="{{ route('admin.order.pdf', $selectedOrder->id) }}" target="_blank" class="btn btn-danger">
                     <i class="ti ti-file-type-pdf me-2"></i>Cetak Invoice
                 </a>
-
                 @endif
             </div>
         </div>
     </div>
 </div>
-

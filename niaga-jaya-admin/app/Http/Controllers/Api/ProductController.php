@@ -10,7 +10,6 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with(['kategori', 'merk'])->latest()->get();
-
         $products->transform(function($product) {
             // Gunakan fungsi asset() agar link otomatis benar (http://127.0.0.1:8000/...)
             // Tanpa kurung siku atau format markdown yang bikin error di Next.js
@@ -25,6 +24,14 @@ class ProductController extends Controller
 
         // 3. Kembalikan data dalam format JSON
         return response()->json($products);
+    }
+
+    public function getFilters()
+    {
+        return response()->json([
+            'categories' => \App\Models\Kategori::all(),
+            'brands'     => \App\Models\Merk::all(),
+        ]);
     }
 
     public function show($id)

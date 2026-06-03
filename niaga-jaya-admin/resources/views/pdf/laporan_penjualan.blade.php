@@ -73,40 +73,43 @@
     <table class="table">
         <thead>
             <tr>
-                <th width="4%" class="text-center">No</th>
-                <th width="18%">No. Pesanan</th>
-                <th width="15%">Nama Pembeli</th>
-                <th width="10%" class="text-center">Tanggal</th>
-                <th width="13%" class="text-right">Total (Rp)</th>
-                <th width="12%" class="text-center">Pembayaran</th>
-                <th width="12%" class="text-center">Pengiriman</th>
-                <th width="16%" class="text-center">No. Resi</th>
+                <th width="3%" class="text-center">No</th>
+                <th width="12%">No. Pesanan</th>
+                <th width="12%">Pembeli</th>
+                <th width="20%">Daftar Produk (Qty)</th>
+                <th width="10%" class="text-center">Total (Rp)</th>
+                <th width="10%">Status Bayar</th>
+                <th width="10%">Pengiriman</th>
             </tr>
         </thead>
         <tbody>
             @foreach($pesananData as $index => $row)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
-                <td class="fw-bold break-word">{{ $row->nomor_pesanan }}</td>
+                <td class="fw-bold">{{ $row->nomor_pesanan }}</td>
                 <td>{{ $row->nama_pembeli }}</td>
-                <td class="text-center">{{ \Carbon\Carbon::parse($row->created_at)->format('d/m/y') }}</td>
+                <td>
+                    <ul style="margin: 0; padding-left: 15px;">
+                        @foreach($row->items as $item)
+                            {{ $item->product->nama_produk ?? 'Produk' }} ({{ $item->jumlah }}x)
+                        @endforeach
+                    </ul>
+                </td>
                 <td class="text-right">{{ number_format($row->total_bayar, 0, ',', '.') }}</td>
                 <td class="text-center">{{ ucfirst($row->status_pembayaran) }}</td>
-                
                 <td class="text-center">
-                    {{ $row->status_pengiriman ? str_replace('_', ' ', ucfirst($row->status_pengiriman)) : 'Menunggu' }}
-                </td>
-                
-                <td class="text-center break-word">
-                    @if(isset($row->status_pengiriman) && $row->status_pengiriman === 'dikirim')
-                        {{ $row->nomor_resi ?? '-' }}
-                    @else
-                        -
-                    @endif
+                    {{ $row->status_pengiriman ? str_replace('_', ' ', ucfirst($row->status_pengiriman)) : '-' }}
                 </td>
             </tr>
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4" class="text-right">TOTAL PENDAPATAN</th>
+                <th class="text-right">{{ number_format($pesananData->sum('total_bayar'), 0, ',', '.') }}</th>
+                <th colspan="2"></th>
+            </tr>
+        </tfoot>
     </table>
 
     <table class="ttd-area">

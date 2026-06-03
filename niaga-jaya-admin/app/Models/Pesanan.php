@@ -14,9 +14,11 @@ class Pesanan extends Model
         'whatsapp_pembeli', 
         'alamat_kirim', 
         'metode_pengiriman', 
+        'status_pengiriman', 
         'total_bayar', 
         'status_pembayaran', 
         'metode_pembayaran', 
+        'nomor_resi', 
         'token_snap', 
         'catatan'
     ];

@@ -29,6 +29,9 @@ class Index extends Component
 	public $jumlah;	
 	public $harga_satuan;	
 	public $subtotal;
+    public $status_pengiriman; 
+    public $produk; 
+    public $nomor_resi;
 
     public $selectedOrder; 
 
@@ -57,7 +60,7 @@ class Index extends Component
         // Memberitahu browser untuk menampilkan modal (asumsi menggunakan JS standar)
         $this->dispatch('show-order-modal'); 
     }
-    public function exportPdf()
+   public function exportPdf()
     {
         // 1. Ambil data pesanan beserta relasi item dan produk
         // Kita gunakan 'latest()' agar yang terbaru muncul di atas
@@ -69,10 +72,10 @@ class Index extends Component
             ->latest()
             ->get();
 
-        // 2. Load view laporan (Anda bisa membuat file baru: resources/views/pdf/laporan-pesanan.blade.php)
+        // 2. Load view laporan
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.laporan_pesanan', [
             'pesananData' => $pesananData
-        ])->setPaper('a4', 'portrait');
+        ])->setPaper('a4', 'landscape'); // <-- UBAH PORTRAIT MENJADI LANDSCAPE DI SINI
 
         // 3. Stream download
         return response()->streamDownload(function () use ($pdf) {
@@ -84,6 +87,59 @@ class Index extends Component
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+   public function editStatus($id)
+    {
+        $pesanan = Pesanan::with('items.product')->findOrFail($id);
+
+        $this->pesanan_id        = $pesanan->id;
+        $this->nama_pembeli      = $pesanan->nama_pembeli;
+        $this->whatsapp_pembeli  = $pesanan->whatsapp_pembeli; // <-- Sudah disesuaikan
+        $this->total_bayar       = 'Rp ' . number_format($pesanan->total_bayar, 0, ',', '.'); // <-- Sudah disesuaikan
+        $this->status_pengiriman = $pesanan->status_pengiriman; 
+        $this->nomor_resi = $pesanan->nomor_resi; 
+
+        // Logika Menggabungkan Produk menjadi 1 teks
+        $daftarProduk = [];
+        foreach ($pesanan->items as $item) {
+            $nama = $item->product ? $item->product->nama_produk : 'Produk Dihapus/Tidak Valid';
+            $daftarProduk[] = $nama . ' (x' . $item->jumlah . ')';
+        }
+        $this->produk = implode(', ', $daftarProduk);
+        
+        $this->dispatch('openUpdateStatusModal');
+    }
+    
+   public function updateStatus()
+    {
+        // Validasi
+        $rules = [
+            'status_pengiriman' => 'required',
+        ];
+
+        // Jika statusnya dikirim, maka nomor resi Wajib diisi
+        if ($this->status_pengiriman === 'dikirim') {
+            $rules['nomor_resi'] = 'required';
+        }
+
+        $this->validate($rules, [
+            'status_pengiriman.required' => 'Status pengiriman harus dipilih.',
+            'nomor_resi.required' => 'Nomor Resi wajib diisi jika statusnya dikirim.'
+        ]);
+
+        // Proses Simpan
+        $pesanan = Pesanan::findOrFail($this->pesanan_id);
+        $pesanan->status_pengiriman = $this->status_pengiriman;
+
+        // Hanya simpan no resi jika statusnya dikirim
+        if ($this->status_pengiriman === 'dikirim') {
+            $pesanan->nomor_resi = $this->nomor_resi;
+        }
+
+        $pesanan->save();
+
+        $this->dispatch('closeUpdateStatusModal');
     }
 
     public function render()

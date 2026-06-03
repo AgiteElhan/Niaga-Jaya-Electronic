@@ -124,7 +124,13 @@
                                                     data-bs-target="#modalDetailPesanan">
                                                 <i class="ti ti-eye fs-4"></i>
                                             </button>
-                                            
+                                            <button wire:click="editStatus({{ $Pesanan->id }})"
+                                                        class="btn btn-warning btn-sm" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#modalUpdateStatus"
+                                                        title="Edit Data">
+                                                    <i class="ti ti-edit"></i>
+                                                </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -180,6 +186,7 @@
             </div>
         </div>
         @include('livewire.admin.pesanan.detail')
+        @include('livewire.admin.pesanan.edit')
 
     </div>
 </div>

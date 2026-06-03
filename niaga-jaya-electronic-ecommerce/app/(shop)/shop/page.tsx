@@ -38,38 +38,35 @@ export default function ShopPage() {
     { label: "Di atas 5 Juta", min: 5000000, max: 100000000 },
   ];
 
-  useEffect(() => {
-    const fetchCatalogData = async () => {
-      try {
-        const BACKEND_URL = "http://localhost:8000"; 
-        const response = await fetch(`${BACKEND_URL}/api/products`); 
-        
-        if (response.ok) {
-          const result = await response.json();
-          const activeProducts: Product[] = result.data || result;
-          
-          setProducts(activeProducts);
+useEffect(() => {
+  const fetchAllData = async () => {
+    try {
+      const BACKEND_URL = "http://localhost:8000";
+      
+      // Fetch Produk
+      const resProducts = await fetch(`${BACKEND_URL}/api/products`);
+      const productsData = await resProducts.json();
+      setProducts(Array.isArray(productsData) ? productsData : (productsData.data || []));
 
-          const uniqueCategories = Array.from(
-            new Set(activeProducts.map((p) => p.kategori?.nama_kategori).filter(Boolean))
-          ) as string[];
-          
-          const uniqueBrands = Array.from(
-            new Set(activeProducts.map((p) => p.merk?.nama_merk).filter(Boolean))
-          ) as string[];
+      // Fetch Kategori & Merk (API Baru)
+      const resFilters = await fetch(`${BACKEND_URL}/api/filters`);
+      const filters = await resFilters.json();
+      
+      // Update state dari data master
+      setCategories(filters.categories.map((c: any) => c.nama_kategori));
+      setBrands(filters.brands.map((b: any) => b.nama_merk));
 
-          setCategories(uniqueCategories);
-          setBrands(uniqueBrands);
-        }
-      } catch (error) {
-        console.error("Gagal sinkronisasi katalog ke database:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    } catch (error) {
+      console.error("Gagal ambil data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchCatalogData();
-  }, []);
+  fetchAllData();
+}, []);
+
+ 
 
   const toggleFilter = (item: string, state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => {
     setState((prev) => (prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]));
@@ -99,22 +96,26 @@ export default function ShopPage() {
       <div className="flex flex-col gap-4">
         <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Kategori</h4>
         <div className="flex flex-col gap-3">
-          {categories.map((cat) => (
-            <label key={cat} className="flex items-center gap-3 group cursor-pointer">
-              <div className="relative flex items-center justify-center flex-shrink-0">
-                <input
-                  type="checkbox"
-                  checked={selectedCategories.includes(cat)}
-                  onChange={() => toggleFilter(cat, selectedCategories, setSelectedCategories)}
-                  className="peer w-5 h-5 appearance-none rounded-lg border-2 border-slate-200 checked:border-blue-600 checked:bg-blue-600 transition-all cursor-pointer"
-                />
-                <Check size={12} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={4} />
-              </div>
-              <span className="text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors uppercase">
-                {cat}
-              </span>
-            </label>
-          ))}
+          {categories.length > 0 ? (
+            categories.map((cat) => (
+              <label key={cat} className="flex items-center gap-3 group cursor-pointer">
+                <div className="relative flex items-center justify-center flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(cat)}
+                    onChange={() => toggleFilter(cat, selectedCategories, setSelectedCategories)}
+                    className="peer w-5 h-5 appearance-none rounded-lg border-2 border-slate-200 checked:border-blue-600 checked:bg-blue-600 transition-all cursor-pointer"
+                  />
+                  <Check size={12} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={4} />
+                </div>
+                <span className="text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors uppercase">
+                  {cat}
+                </span>
+              </label>
+            ))
+          ) : (
+            <p className="text-[10px] text-slate-400 italic px-1">Belum ada kategori tersedia.</p>
+          )}
         </div>
       </div>
 
@@ -122,22 +123,26 @@ export default function ShopPage() {
       <div className="flex flex-col gap-4">
         <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Merk</h4>
         <div className="flex flex-col gap-3">
-          {brands.map((brand) => (
-            <label key={brand} className="flex items-center gap-3 group cursor-pointer">
-              <div className="relative flex items-center justify-center flex-shrink-0">
-                <input
-                  type="checkbox"
-                  checked={selectedBrands.includes(brand)}
-                  onChange={() => toggleFilter(brand, selectedBrands, setSelectedBrands)}
-                  className="peer w-5 h-5 appearance-none rounded-lg border-2 border-slate-200 checked:border-blue-600 checked:bg-blue-600 transition-all cursor-pointer"
-                />
-                <Check size={12} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={4} />
-              </div>
-              <span className="text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors">
-                {brand}
-              </span>
-            </label>
-          ))}
+          {brands.length > 0 ? (
+            brands.map((brand) => (
+              <label key={brand} className="flex items-center gap-3 group cursor-pointer">
+                <div className="relative flex items-center justify-center flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={selectedBrands.includes(brand)}
+                    onChange={() => toggleFilter(brand, selectedBrands, setSelectedBrands)}
+                    className="peer w-5 h-5 appearance-none rounded-lg border-2 border-slate-200 checked:border-blue-600 checked:bg-blue-600 transition-all cursor-pointer"
+                  />
+                  <Check size={12} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={4} />
+                </div>
+                <span className="text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors">
+                  {brand}
+                </span>
+              </label>
+            ))
+          ) : (
+            <p className="text-[10px] text-slate-400 italic px-1">Belum ada merk tersedia.</p>
+          )}
         </div>
       </div>
 

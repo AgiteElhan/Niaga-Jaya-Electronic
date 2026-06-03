@@ -86,5 +86,73 @@
     </script>
 
 </body>
+<div id="global-loader">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Memuat Data...</div>
+</div>
+
+<style>
+    /* Styling untuk background putih yang menutupi seluruh layar */
+    #global-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #ffffff; /* Warna background */
+        z-index: 99999; /* Pastikan selalu paling atas */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    /* Styling untuk animasi lingkaran berputar */
+    .loader-spinner {
+        width: 60px;
+        height: 60px;
+        border: 6px solid #f3f3f3; /* Warna abu-abu terang */
+        border-top: 6px solid #2563EB; /* Warna biru khas Niaga Jaya */
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+    }
+
+    .loader-text {
+        font-family: sans-serif;
+        font-weight: bold;
+        color: #64748b;
+        letter-spacing: 1px;
+    }
+
+    /* Keyframe untuk animasi putaran */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Class tambahan yang akan dipanggil oleh JavaScript saat halaman selesai dimuat */
+    .loader-hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+</style>
+
+<script>
+    // Script ini akan berjalan otomatis saat seluruh elemen (gambar, teks, dll) selesai dimuat
+    window.addEventListener('load', function () {
+        const loader = document.getElementById('global-loader');
+        if (loader) {
+            // Tambahkan class loader-hidden agar loading screen memudar dan menghilang
+            loader.classList.add('loader-hidden');
+            
+            // Hapus elemen dari HTML setelah animasi memudar selesai (500ms) agar tidak mengganggu klik
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+        }
+    });
+</script>
 
 </html>
