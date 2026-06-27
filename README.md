@@ -120,39 +120,45 @@ niaga-jaya-user/
 
 # ⚙️ Cara Instalasi
 
-## 1 Clone Repository
+## Requirements
+
+- PHP 8.2+
+- Composer
+- Node.js 20+
+- Laragon / XAMPP
+- MySQL / phpMyAdmin
+
+---
+
+## 1. Clone Repository
 
 ```bash
-git clone https://github.com/username/niaga-jaya-electronic.git
+git clone https://github.com/AgitElhandinnata/niaga-jaya-electronic.git
 ```
 
 ---
 
-## 2 Masuk ke Project Backend
+## 2. Backend Installation
+
+Masuk ke folder backend
 
 ```bash
 cd niaga-jaya-admin
 ```
 
----
-
-## 3 Install Dependency
+Install dependency
 
 ```bash
 composer install
 ```
 
----
-
-## 4 Copy File Environment
+Copy file environment
 
 ```bash
 cp .env.example .env
 ```
 
----
-
-## 5 Generate Key
+Generate key
 
 ```bash
 php artisan key:generate
@@ -160,60 +166,81 @@ php artisan key:generate
 
 ---
 
-## 6 Konfigurasi Database
+## 3. Konfigurasi Database
 
-Ubah konfigurasi database pada file `.env`.
+Buat database baru di phpMyAdmin dengan nama:
 
-### Menggunakan MySQL (Local)
+```
+niaga-jaya-electronic
+```
+
+Kemudian ubah file `.env`
 
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
-DB_PORT=3307
+DB_PORT=3306
 DB_DATABASE=niaga-jaya-electronic
 DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-### Menggunakan Supabase PostgreSQL
+> **Catatan:** Jika menggunakan Laragon dan MySQL berjalan pada port `3307` atau port lain, sesuaikan nilai `DB_PORT` dengan konfigurasi MySQL Anda.
 
-```env
-DB_CONNECTION=pgsql
-DB_HOST=YOUR_SUPABASE_HOST
-DB_PORT=6543
-DB_DATABASE=postgres
-DB_USERNAME=YOUR_USERNAME
-DB_PASSWORD=YOUR_PASSWORD
+---
+
+## 4. Jalankan Migration
+
+```bash
+php artisan migrate
 ```
 
 ---
 
-## 7 Import Database
+## 5. Jalankan Seeder (Opsional)
 
-Project ini menggunakan database MySQL.
+Jika project menyediakan seeder:
 
-Import file:
-
-```
-database/niaga-jaya-electronic.sql
+```bash
+php artisan db:seed
 ```
 
-ke phpMyAdmin terlebih dahulu.
+atau
 
-Setelah database berhasil diimport, jalankan:
+```bash
+php artisan migrate --seed
+```
+
+---
+
+## 6. Storage Link
+
+```bash
+php artisan storage:link
+```
+
+---
+
+## 7. Jalankan Backend
 
 ```bash
 php artisan serve
 ```
 
+Backend akan berjalan di
+
+```
+http://127.0.0.1:8000
+```
+
 ---
 
-# Frontend
+# Frontend Installation
 
 Masuk ke folder frontend
 
 ```bash
-cd niaga-jaya-user
+cd niaga-jaya-electronic-ecommerce
 ```
 
 Install dependency
@@ -222,15 +249,21 @@ Install dependency
 npm install
 ```
 
-Jalankan
+Jalankan project
 
 ```bash
 npm run dev
 ```
 
+Frontend akan berjalan di
+
+```
+http://localhost:3000
+```
+
 ---
 
-# Midtrans
+# Konfigurasi Midtrans
 
 Tambahkan konfigurasi berikut pada file `.env`
 
@@ -242,27 +275,14 @@ MIDTRANS_IS_PRODUCTION=false
 
 ---
 
-# Clerk
+# Konfigurasi Clerk
 
-Tambahkan konfigurasi
+Tambahkan konfigurasi berikut pada file `.env.local`
 
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 ```
-
----
-
-# Storage
-
-Jalankan
-
-```bash
-php artisan storage:link
-```
-
----
-
 # Screenshot
 
 ## Landing Page
