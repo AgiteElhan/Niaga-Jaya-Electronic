@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\UlasanController;
 use App\Http\Controllers\Api\ClerkWebhookController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\MidtransController;
+use App\Http\Controllers\Api\PaymentController;
 
 
 Route::get('/user', function (Request $request) {
@@ -30,6 +31,8 @@ Route::post('/orders', [OrderController::class, 'store']);
 
 Route::get('/orders/{order_id}', [OrderController::class, 'show']);
 
+Route::get('/payment/{orderId}', [OrderController::class, 'paymentDetail']);
+
 Route::get('/orders', [OrderController::class, 'index']);
 
 Route::post('/reviews', [UlasanController::class, 'store']);
@@ -37,4 +40,8 @@ Route::post('/reviews', [UlasanController::class, 'store']);
 Route::post('/midtrans-callback', [MidtransController::class, 'callback']);
 
 Route::post('/orders/{id}/receive', [OrderController::class, 'receiveOrder']);
+Route::post('/orders/{id}/cancel', [OrderController::class, 'cancelOrder']);
 Route::get('/filters', [ProductController::class, 'getFilters']);
+
+
+Route::post('/midtrans/notification', [PaymentController::class, 'handleCallback']);

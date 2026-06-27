@@ -19,6 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Menangani CORS agar domain localhost:3000 diizinkan
         $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
+
+        // Menambahkan pengecualian CSRF untuk webhook Midtrans
+        $middleware->validateCsrfTokens(except: [
+            'api/midtrans/notification',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

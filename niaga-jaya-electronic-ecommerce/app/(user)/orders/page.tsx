@@ -63,15 +63,25 @@ export default function OrdersPage() {
   }, [isLoaded, isSignedIn, user?.id]);
 
   // Helper warna badge mengikuti status database lokal lu ('menunggu', 'berhasil', 'gagal')
+ // Helper warna badge
   const getStatusStyle = (status: string) => {
     switch (status?.toLowerCase()) {
       case "berhasil": case "success": case "settlement": 
         return "bg-green-50 text-green-700 border-green-200";
-      case "gagal": case "deny": case "expire": 
+      case "gagal": case "deny": case "expire": case "dibatalkan": case "batal": case "cancel": 
         return "bg-red-50 text-red-700 border-red-200";
       default: 
         return "bg-amber-50 text-amber-700 border-amber-200"; // Menunggu / Pending
     }
+  };
+
+  // Helper teks badge agar lebih rapi (terjemahan otomatis)
+  const getStatusText = (status: string) => {
+    const s = status?.toLowerCase();
+    if (["berhasil", "success", "settlement"].includes(s)) return "Berhasil";
+    if (["dibatalkan", "batal", "cancel"].includes(s)) return "Dibatalkan";
+    if (["gagal", "deny", "expire"].includes(s)) return "Gagal";
+    return status; // Menunggu / Pending
   };
 
   if (!mounted || !isLoaded) return null;
@@ -156,7 +166,7 @@ export default function OrdersPage() {
                           {order.order_id}
                         </h3>
                         <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${getStatusStyle(order.status_pesanan)}`}>
-                          {order.status_pesanan === 'settlement' || order.status_pesanan === 'success' ? 'Berhasil' : order.status_pesanan}
+                          {getStatusText(order.status_pesanan)}
                         </span>
                       </div>
                       

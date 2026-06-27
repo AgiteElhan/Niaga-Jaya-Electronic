@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useCartStore } from "@/store/useCartStore";
+import Image from "next/image"; // Gunakan Next Image untuk performa
+
 import { 
-  CreditCard, MapPin, Truck, Receipt, ArrowRight, Loader2, 
-  User, Phone, Home, Building2, Check, ArrowLeft, Smartphone, Landmark
+  MapPin, Truck, Receipt, Loader2, 
+  User, Phone, Home, Building2, Check, ArrowLeft, CreditCard, ChevronDown, ChevronRight
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -16,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 const SHIPPING_OPTIONS = [
   { id: "jnt", name: "J&T Cargo - Regular", price: 25000, desc: "Estimasi tiba dalam 2-3 hari" },
@@ -23,10 +26,35 @@ const SHIPPING_OPTIONS = [
   { id: "sicepat", name: "SiCepat REG", price: 24000, desc: "Estimasi tiba dalam 1-2 hari" },
 ];
 
-const PAYMENT_OPTIONS = [
-  { id: "gopay", name: "GoPay / QRIS", type: "E-Wallet", icon: Smartphone },
-  { id: "bca_va", name: "BCA Virtual Account", type: "Transfer Bank", icon: Landmark },
-  { id: "mandiri_va", name: "Mandiri Bill Payment", type: "Transfer Bank", icon: Landmark },
+// UPDATED STRUCTURE: Categorized Payment Options with actual logo URLs from your image
+const PAYMENT_CATEGORIES = [
+  {
+    category: "QRIS",
+    options: [
+      { id: "qris", name: "QRIS", logo: "/payment/qris.jpeg" },
+    ]
+  },
+  {
+    category: "Virtual account",
+    options: [
+      { id: "bca_va", name: "BCA VA", logo: "/payment/bca.jpeg" },
+      { id: "bni_va", name: "BNI VA", logo: "/payment/bni.jpeg" },
+      { id: "bri_va", name: "BRI VA", logo: "/payment/bri.jpeg" },
+      { id: "mandiri_va", name: "Mandiri VA", logo: "/payment/mandiri.jpeg" },
+      { id: "permata_va", name: "Permata VA", logo: "/payment/permata.jpeg" },
+      { id: "cimb_va", name: "CIMB VA", logo: "/payment/cimbniaga.jpeg" },
+      { id: "bsi_va", name: "BSI VA", logo: "/payment/bsi.jpeg" },
+    ]
+  },
+  // {
+  //   category: "Card Payment",
+  //   options: [
+  //     { id: "credit_card_visa", name: "Visa", logo: "/payment/visa.jpeg" },
+  //     { id: "credit_card_mastercard", name: "Mastercard", logo: "/payment/Mastercard.jpeg" },
+  //     // { id: "credit_card_jcb", name: "JCB", logo: "" },
+  //     // { id: "credit_card_amex", name: "Amex", logo: "" },
+  //   ]
+  // },
 ];
 
 interface SavedAddress {
@@ -52,11 +80,17 @@ interface CheckoutDialogProps {
 }
 
 export default function CheckoutDialog({ products = [], isFromCart = false }: CheckoutDialogProps) {
-  const { user } = useUser(); 
-  const { removeFromCart } = useCartStore(); // <--- TAMBAHKAN BARIS INI
+  const { user } = useUser();
+  const { removeFromCart } = useCartStore();
+  const router = useRouter();
   const [selectedShipping, setSelectedShipping] = useState(SHIPPING_OPTIONS[0]);
-  const [selectedPayment, setSelectedPayment] = useState(PAYMENT_OPTIONS[0]);
   
+  // State holds the full option object, initialized to the first available option
+  const [selectedPayment, setSelectedPayment] = useState(PAYMENT_CATEGORIES[0].options[0]);
+  
+  // State to track expanded categories for the accordion-style list
+  const [openCategories, setOpenCategories] = useState<string[]>([PAYMENT_CATEGORIES[0].category, PAYMENT_CATEGORIES[1].category]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
 
@@ -65,14 +99,9 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
   const [addressView, setAddressView] = useState<"list" | "add">("list");
 
   const [newAddressForm, setNewAddressForm] = useState({
-    name: "",
-    phone: "",
-    fullAddress: "",
-    city: "",
-    isDefault: false,
+    name: "", phone: "", fullAddress: "", city: "", isDefault: false,
   });
 
-  // Muat alamat dari localStorage
   useEffect(() => {
     if (isBuyModalOpen) {
       const saved = localStorage.getItem("niaga_jaya_multi_addresses");
@@ -106,7 +135,6 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
     }
   }, [isBuyModalOpen]);
 
-  // Kalkulasi total belanja produk
   const productsSubtotal = products.reduce((total, item) => {
     return total + (Number(item.harga_jual) * item.quantity);
   }, 0);
@@ -155,7 +183,6 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
     }
   };
 
-  // INTEGRASI REAL API: LARAVEL + MIDTRANS GATEWAY
   const handleMidtransPayment = async () => {
     if (!selectedAddressId) {
       return toast.error("Oops!", { description: "Pilih salah satu alamat pengiriman terlebih dahulu." });
@@ -164,32 +191,29 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
     const currentAddress = addresses.find(a => a.id === selectedAddressId);
     if (!currentAddress) return;
 
-    // Kunci Order ID unik dari Next.js biar sama di Laravel & Midtrans
     const generatedOrderId = `NJE-${Date.now()}`;
 
     try {
       setIsSubmitting(true);
-      toast.info("Memproses Pesanan...", { description: "Sedang mencatatkan transaksi ke database Supabase." });
+      toast.info("Memproses Pesanan...");
 
-      // =========================================================
-      // JALUR A: HIT API LARAVEL UNTUK SIMPAN DATA KE SUPABASE
-      // =========================================================
       const laravelResponse = await fetch("http://localhost:8000/api/orders", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
-      body: JSON.stringify({
-        order_id: generatedOrderId,
-        customer_name: currentAddress.name,
-        customer_phone: currentAddress.phone,
-        clerk_id: user?.id, 
-        shipping_address: `${currentAddress.fullAddress}, ${currentAddress.city}`, 
-        shipping_method: selectedShipping.name, // Mengirim nama kurir ekspedisi (J&T, JNE, dll)
-        grand_total: grandTotal,
-        items: products,
-      }),
+        body: JSON.stringify({
+          order_id: generatedOrderId,
+          customer_name: currentAddress.name,
+          customer_phone: currentAddress.phone,
+          clerk_id: user?.id, 
+          shipping_address: `${currentAddress.fullAddress}, ${currentAddress.city}`, 
+          shipping_method: selectedShipping.name,
+          grand_total: grandTotal,
+          payment_type: selectedPayment.id,
+          items: products,
+        }),
       });
 
       const laravelData = await laravelResponse.json();
@@ -197,113 +221,51 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
       if (!laravelResponse.ok) {
         throw new Error(laravelData.error || "Gagal mencatatkan pesanan ke database server Laravel.");
       }
-
-      // =========================================================
-      // JALUR B: MINTA TOKEN SNAP PADA NEXT.JS BACKEND (API ROUTE)
-      // =========================================================
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: generatedOrderId, // Overwrite pake orderId yang sama dengan Laravel
-          products: products,
-          address: {
-            name: currentAddress.name,
-            phone: currentAddress.phone,
-            fullAddress: currentAddress.fullAddress,
-            city: currentAddress.city,
-          },
-          shippingFee: shippingFee,
-          adminFee: adminFee,
-          grandTotal: grandTotal,
-        }),
-      });
-
-     // ... (kode sebelumnya)
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Gagal membuat invoice Midtrans");
-      }
-
-      setIsSubmitting(false);
-
-      // =========================================================
-      // SOLUSI: TUTUP DIALOG NEXT.JS DULU SEBELUM BUKA MIDTRANS
-      // =========================================================
+      
       setIsBuyModalOpen(false); 
 
-      // =========================================================
-      // FITUR BARU: HAPUS BARANG DARI KERANJANG
-      // =========================================================
       if (isFromCart) {
         products.forEach((product) => {
-          removeFromCart(Number(product.id)); // <-- Tambahkan Number() di sini
+          removeFromCart(Number(product.id)); 
         });
       }
 
-      // Beri jeda 1 detik agar pelindung layar Next.js benar-benar hilang, baru buka Midtrans
-      // Beri jeda 1 detik agar pelindung layar Next.js benar-benar hilang, baru buka Midtrans
-      setTimeout(() => {
-        // 1. Akali TypeScript dengan mengubah window menjadi 'any'
-        const snapWindow = window as any;
+      setIsSubmitting(false);
 
-        if (snapWindow.snap) {
-          snapWindow.snap.pay(data.token, {
-            // 2. Matikan peringatan linter khusus untuk baris ini
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onSuccess: function (result: any) {
-              toast.success("Pembayaran Berhasil!", {
-                description: `Terima kasih! Transaksi ${result.order_id} sukses diproses.`,
-              });
-            },
-            onPending: function () {
-              toast.info("Menunggu Pembayaran", {
-                description: "Pesanan aman disimpan. Silakan bayar melalui tagihan invoice QRIS Anda.",
-              });
-            },
-            onError: function () {
-              toast.error("Pembayaran Gagal", {
-                description: "Transaksi Anda ditolak oleh payment gateway.",
-              });
-            },
-            onClose: function () {
-              toast.warning("Transaksi Ditutup", {
-                description: "Anda membatalkan pengisian invoice pembayaran langsung.",
-              });
-            },
-          });
-        } else {
-          toast.error("Sistem SDK Error", { description: "Gagal memuat modul Snap script di browser." });
-        }
-      }, 1000); // Waktu jeda 1 detik
+      localStorage.setItem("payment_data", JSON.stringify(laravelData.payment_data));
+      router.push(`/payment/${generatedOrderId}`);
 
     } catch (error: any) {
-    // ... (sisa kode error catch biarkan sama){
       setIsSubmitting(false);
       console.error(error);
-      toast.error("Gagal Mengamankan Pesanan", { description: error.message || "Kesalahan jaringan internal backend." });
+      toast.error("Gagal Mengamankan Pesanan", {
+        description: error.message || "Kesalahan jaringan internal backend.",
+      });
     }
+  };
+
+  const toggleCategory = (category: string) => {
+    setOpenCategories(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category) 
+        : [...prev, category]
+    );
   };
 
   return (
     <Dialog open={isBuyModalOpen} onOpenChange={handleModalChange}>
-
-<DialogTrigger asChild>
-  <button 
-    type="button" 
-    style={{ pointerEvents: 'auto', zIndex: 9999 }}
-    className="w-full h-14 bg-blue-600 text-white font-bold rounded-2xl cursor-pointer"
-    onClick={(e) => {
-      console.log("Tombol Checkout diklik!"); // Cek konsol F12!
-    }}
-  >
-    Checkout Sekarang
-  </button>
-</DialogTrigger>
+      <DialogTrigger asChild>
+        <button 
+          type="button" 
+          style={{ pointerEvents: 'auto', zIndex: 9999 }}
+          className="w-full h-14 bg-blue-600 text-white font-bold rounded-2xl cursor-pointer"
+        >
+          Checkout Sekarang
+        </button>
+      </DialogTrigger>
       
-      <DialogContent className="w-[95%] sm:max-w-[550px] rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 border-none overflow-y-auto max-h-[92vh] sm:max-h-[90vh] shadow-2xl scrollbar-none bg-white">
-        <DialogHeader className="border-b border-slate-50 pb-3 sm:pb-4">
+      <DialogContent className="w-[95%] sm:max-w-[550px] rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 border-none overflow-y-auto max-h-[92vh] sm:max-h-[90vh] shadow-2xl scrollbar-none bg-slate-50">
+        <DialogHeader className="border-b border-slate-200 pb-3 sm:pb-4">
           <DialogTitle className="text-base sm:text-xl font-black tracking-tight text-slate-900 text-center">
             {addressView === "list" ? "Detail Pengisian Checkout" : "Tambah Alamat Baru"}
           </DialogTitle>
@@ -318,13 +280,12 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
               </div>
             )}
 
-            {/* SEKSI RINCIAN BARANG BELANJAAN */}
-            <div className="space-y-1.5">
+           <div className="space-y-1.5">
               <div className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest px-0.5">
                 Rincian Barang Belanjaan ({products.length})
               </div>
               
-              <div className="space-y-2 max-h-[120px] sm:max-h-[160px] overflow-y-auto pr-1 border border-slate-100 p-2 rounded-xl sm:rounded-2xl bg-slate-50/50 scrollbar-thin">
+              <div className="space-y-2 max-h-[120px] sm:max-h-[160px] overflow-y-auto pr-1 border border-slate-100 p-2 rounded-xl sm:rounded-2xl bg-white scrollbar-thin">
                 {products.length > 0 ? (
                   products.map((item) => (
                     <div key={item.id} className="bg-white border border-slate-100 p-2 sm:p-3 rounded-xl flex items-center gap-2.5 sm:gap-3.5 shadow-sm">
@@ -354,7 +315,7 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
               </div>
             </div>
 
-            {/* SEKSI ALAMAT PENERIMA */}
+            {/* SEKSI ALAMAT PENERIMA (Sama seperti sebelumnya) */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-[10px] sm:text-xs font-black uppercase tracking-widest px-0.5">
                 <span className="text-slate-400 flex items-center gap-1">
@@ -376,8 +337,8 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
                     onClick={() => setSelectedAddressId(addr.id)}
                     className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border text-left cursor-pointer transition-all relative ${
                       selectedAddressId === addr.id 
-                        ? "border-blue-600 bg-blue-50/20 ring-1 ring-blue-600" 
-                        : "border-slate-100 bg-slate-50 hover:bg-slate-100/70"
+                        ? "border-blue-600 bg-blue-50/20 ring-1 ring-blue-600 shadow-sm" 
+                        : "border-slate-100 bg-white hover:bg-slate-100/70"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -403,7 +364,7 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
               </div>
             </div>
 
-            {/* SEKSI EKSPEDISI KURIR */}
+            {/* SEKSI EKSPEDISI KURIR (Sama seperti sebelumnya) */}
             <div className="space-y-2">
               <div className="flex items-center gap-1 text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest px-0.5">
                 <Truck size={12} className="text-blue-600" /> Opsi Ekspedisi Pengiriman
@@ -416,7 +377,7 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
                     onClick={() => setSelectedShipping(option)}
                     className={`flex justify-between items-center p-2.5 rounded-xl border text-left transition-all ${
                       selectedShipping.id === option.id 
-                        ? "border-blue-600 bg-blue-50/40 ring-1 ring-blue-600" 
+                        ? "border-blue-600 bg-blue-50/40 ring-1 ring-blue-600 shadow-sm" 
                         : "border-slate-100 bg-white hover:bg-slate-50"
                     }`}
                   >
@@ -429,13 +390,84 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
                 ))}
               </div>
             </div>
+            <div className="space-y-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-100 shadow-sm">
+              <div className="flex items-center gap-1.5 text-xs font-black text-slate-700 uppercase tracking-widest">
+                <CreditCard size={14} className="text-blue-600" /> Metode Pembayaran
+              </div>
 
-            {/* RINCIAN RINGKASAN PEMBAYARAN */}
-            <div className="space-y-1.5 border-t border-slate-100 pt-2.5">
-              <div className="flex items-center gap-1 text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest mb-0.5">
+              <div className="space-y-4 mt-2">
+                {PAYMENT_CATEGORIES.map((category) => (
+                  <div key={category.category} className="space-y-1.5">
+                    <button
+                      type="button"
+                      onClick={() => toggleCategory(category.category)}
+                      className="flex items-center justify-between w-full p-2 rounded-lg text-left text-[10px] sm:text-xs font-bold text-slate-500 hover:bg-slate-50 uppercase ml-1 border-b border-dashed border-slate-100 pb-2 mb-2"
+                    >
+                      <span>{category.category}</span>
+                      {openCategories.includes(category.category) ? (
+                        <ChevronDown size={14} className="text-slate-400" />
+                      ) : (
+                        <ChevronRight size={14} className="text-slate-400" />
+                      )}
+                    </button>
+
+                    {/* Content Panel (Accordion-style collapsible list of options with logos) */}
+                    {openCategories.includes(category.category) && (
+                      <div className="grid grid-cols-1 gap-2 border-t border-dashed border-slate-100 pt-2">
+                        {category.options.map((option) => (
+                          <button
+                            key={option.id}
+                            type="button"
+                            onClick={() => setSelectedPayment(option)}
+                            className={`
+                              flex items-center justify-between w-full p-3 rounded-xl border transition-all text-left
+                              ${
+                                selectedPayment.id === option.id
+                                  ? "border-blue-600 bg-blue-50/50 ring-1 ring-blue-600 shadow-sm"
+                                  : "border-slate-200 bg-white hover:bg-slate-50"
+                              }
+                            `}
+                          >
+                            <div className="flex items-center gap-3">
+                              {/* Realistic Logo Rendering with specific aspect ratio based on the type */}
+                              <div className="relative shrink-0 flex items-center justify-center p-0.5 border border-slate-100 rounded bg-white" style={{ width: '60px', height: '35px' }}>
+                                <Image 
+                                  src={option.logo} 
+                                  alt={option.name}
+                                  fill
+                                  className="object-contain p-1"
+                                />
+                              </div>
+                              
+                              <div className="flex flex-col">
+                                <span className="text-xs sm:text-sm font-bold text-slate-700">
+                                  {option.name}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* TikTok-style selection check indicator */}
+                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                              selectedPayment.id === option.id 
+                                ? "bg-blue-600 border-blue-600" 
+                                : "border-slate-300 bg-white"
+                            }`}>
+                              {selectedPayment.id === option.id && <Check size={10} className="text-white" strokeWidth={4} />}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+             <div className="space-y-1.5 pt-2.5 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+              <div className="flex items-center gap-1 text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
                 <Receipt size={12} className="text-blue-600" /> Ringkasan Pembayaran
               </div>
-              <div className="space-y-1 text-[11px] sm:text-xs font-semibold text-slate-500">
+              <div className="space-y-1.5 text-[11px] sm:text-xs font-semibold text-slate-500">
                 <div className="flex justify-between">
                   <span>Subtotal Belanja Barang</span>
                   <span className="text-slate-900 font-bold">Rp {productsSubtotal.toLocaleString("id-ID")}</span>
@@ -448,21 +480,21 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
                   <span>Biaya Jasa Sistem</span>
                   <span className="text-slate-900 font-bold">Rp {adminFee.toLocaleString("id-ID")}</span>
                 </div>
-                <div className="flex justify-between text-xs sm:text-base font-black text-slate-900 border-t border-dashed border-slate-200 pt-2 mt-1">
+                <div className="flex justify-between text-xs sm:text-base font-black text-slate-900 border-t border-dashed border-slate-200 pt-2 mt-2">
                   <span>Total Pembayaran</span>
                   <span className="text-blue-600 text-sm sm:text-lg">Rp {grandTotal.toLocaleString("id-ID")}</span>
                 </div>
               </div>
             </div>
 
-            {/* TOMBOL AKSI UTAMA DIALOG DENGAN PROTEKSI SUBMITTING */}
+            {/* TOMBOL AKSI UTAMA (Sama seperti sebelumnya) */}
             <div className="flex gap-2.5 pt-1.5">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setIsBuyModalOpen(false)}
                 disabled={isSubmitting}
-                className="flex-1 h-11 sm:h-14 rounded-xl sm:rounded-2xl border border-slate-100 font-bold text-slate-500 hover:bg-slate-50 text-xs uppercase tracking-wider"
+                className="flex-1 h-11 sm:h-14 rounded-xl sm:rounded-2xl border border-slate-200 bg-white font-bold text-slate-500 hover:bg-slate-50 text-xs uppercase tracking-wider shadow-sm"
               >
                 Batal
               </Button>
@@ -486,9 +518,8 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
           </div>
         )}
 
-        {/* JALUR TAMPILAN B: FORM TAMBAH ALAMAT BARU */}
         {addressView === "add" && (
-          <form onSubmit={handleSaveNewAddress} className="space-y-3.5 pt-1">
+          <form onSubmit={handleSaveNewAddress} className="space-y-3.5 pt-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
             <div className="space-y-2.5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div className="relative">

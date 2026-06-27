@@ -128,13 +128,29 @@ class Index extends Component
             'nomor_resi.required' => 'Nomor Resi wajib diisi jika statusnya dikirim.'
         ]);
 
-        // Proses Simpan
-        $pesanan = Pesanan::findOrFail($this->pesanan_id);
+        $pesanan = Pesanan::with('items.product')->findOrFail($this->pesanan_id);
+
+        $statusLama = $pesanan->status_pengiriman;
+
         $pesanan->status_pengiriman = $this->status_pengiriman;
 
         // Hanya simpan no resi jika statusnya dikirim
         if ($this->status_pengiriman === 'dikirim') {
             $pesanan->nomor_resi = $this->nomor_resi;
+        }
+
+        if ($statusLama !== 'dikirim' && $this->status_pengiriman === 'dikirim') {
+
+            foreach ($pesanan->items as $item) {
+
+                if ($item->product) {
+
+                    $item->product->decrement('stok', $item->jumlah);
+
+                }
+
+            }
+
         }
 
         $pesanan->save();

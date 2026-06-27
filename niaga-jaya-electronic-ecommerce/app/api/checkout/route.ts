@@ -12,14 +12,14 @@ const snap = new midtransClient.Snap({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { products, address, shippingFee, adminFee, grandTotal } = body;
+    const { orderId, products, address, shippingFee, adminFee, grandTotal } = body;
 
     if (!products || products.length === 0) {
       return NextResponse.json({ error: "Keranjang kosong" }, { status: 400 });
     }
 
     // 1. Buat ID Transaksi Unik (contoh: NJE-1715692389)
-    const orderId = `NJE-${Date.now()}`;
+    // const orderId = `NJE-${Date.now()}`;
 
     // 2. Format list item sesuai spesifikasi objek Midtrans
     const itemDetails = products.map((item: any) => ({

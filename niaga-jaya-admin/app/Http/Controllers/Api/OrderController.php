@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+
 use App\Http\Controllers\Controller; 
 use Illuminate\Http\Request;
+use Midtrans\Config;
+use Midtrans\CoreApi;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
@@ -57,12 +60,14 @@ class OrderController extends Controller
         // 1. Ambil data pesanan
         $order = DB::table('pesanan')
             ->where('nomor_pesanan', $order_id) 
-            ->where('clerk_id', $clerkId)
             ->first();
 
         if (!$order) {
             return response()->json(['error' => 'Pesanan tidak ditemukan'], 404);
         }
+
+        $order->payment_response =
+        json_decode($order->payment_response, true);
 
         // 2. AMBIL SEMUA PRODUK 
         $items = DB::table('pesanan_item')
@@ -87,7 +92,7 @@ class OrderController extends Controller
             // --- PERBAIKAN DI SINI ---
             'status_pengiriman' => $order->status_pengiriman ?? 'menunggu', // Tambahkan ini
             'nomor_resi' => $order->nomor_resi ?? '-', // Ganti agar mengambil dari database
-            // -------------------------
+            'payment_response' => $order->payment_response,
 
             'nama_penerima' => $order->nama_pembeli,
             'nomor_telepon' => $order->whatsapp_pembeli,
@@ -102,9 +107,36 @@ class OrderController extends Controller
             'is_reviewed' => $isReviewed,
         ], 200);
     }
-   public function store(Request $request)
+
+    public function paymentDetail($orderId)
     {
-        // 1. Validasi semua field yang wajib ada di database 'pesanan'
+        $order = DB::table('pesanan')
+            ->where('nomor_pesanan', $orderId)
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Pesanan tidak ditemukan'
+            ], 404);
+        }
+
+        $paymentResponse = null;
+
+        if (!empty($order->payment_response)) {
+            $paymentResponse = json_decode($order->payment_response, true);
+        }
+
+        return response()->json([
+            'order_id' => $order->nomor_pesanan,
+            'total_bayar' => $order->total_bayar,
+            'status_pembayaran' => $order->status_pembayaran,
+            'metode_pembayaran' => $order->metode_pembayaran,
+            'payment_response' => $paymentResponse
+        ]);
+    }
+
+    public function store(Request $request)
+    {
         $request->validate([
             'order_id'         => 'required|string',
             'clerk_id'         => 'required|string',
@@ -112,6 +144,7 @@ class OrderController extends Controller
             'customer_phone'   => 'required|string',
             'shipping_address' => 'required|string',
             'shipping_method'  => 'required|string',
+            'payment_type'     => 'required|string',
             'grand_total'      => 'required|numeric',
             'items'            => 'required|array'
         ]);
@@ -119,7 +152,21 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            // 2. Simpan ke tabel 'pesanan' dengan semua kolom wajib
+            foreach ($request->items as $item) {
+                $produk = DB::table('product')->where('id', $item['id'])->first();
+                if (!$produk) {
+                    DB::rollBack();
+                    return response()->json(['error' => "Produk tidak ditemukan di sistem."], 404);
+                }
+
+                if ($item['quantity'] > $produk->stok) { 
+                    DB::rollBack(); // Batalkan semua proses simpan
+                    return response()->json([
+                        'error' => "Maaf, stok '{$produk->nama_produk}' tidak mencukupi. Sisa stok: {$produk->stok}"
+                    ], 400); 
+                }
+            }
+
             $pesananId = DB::table('pesanan')->insertGetId([
                 'nomor_pesanan'     => $request->order_id,
                 'clerk_id'          => $request->input('clerk_id'),
@@ -136,7 +183,6 @@ class OrderController extends Controller
                 'updated_at'        => now(),
             ]);
 
-            // 3. Simpan ke tabel 'pesanan_item' (TANPA kolom nama_produk karena tidak ada di DB)
             foreach ($request->items as $item) {
                 $subtotalItem = $item['harga_jual'] * $item['quantity'];
                 
@@ -151,11 +197,239 @@ class OrderController extends Controller
                 ]);
             }
 
+            Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+            Config::$isProduction = false;
+            Config::$isSanitized = true;
+            Config::$is3ds = true;
+
+            $midtransPayload = [];
+
+            $paymentType = $request->payment_type;
+
+            switch ($paymentType) {
+
+                case 'qris':
+
+                    $midtransPayload = [
+                        'payment_type' => 'qris',
+                        'transaction_details' => [
+                            'order_id' => $request->order_id,
+                            'gross_amount' => (int)$request->grand_total,
+                        ]
+                    ];
+
+                    break;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | BCA Virtual Account
+                |--------------------------------------------------------------------------
+                */
+                case 'bca_va':
+
+                    $midtransPayload = [
+                        'payment_type' => 'bank_transfer',
+
+                        'transaction_details' => [
+                            'order_id' => $request->order_id,
+                            'gross_amount' => (int)$request->grand_total,
+                        ],
+
+                        'bank_transfer' => [
+                            'bank' => 'bca'
+                        ]
+                    ];
+
+                    break;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | BNI Virtual Account
+                |--------------------------------------------------------------------------
+                */
+                case 'bni_va':
+
+                    $midtransPayload = [
+                        'payment_type' => 'bank_transfer',
+
+                        'transaction_details' => [
+                            'order_id' => $request->order_id,
+                            'gross_amount' => (int)$request->grand_total,
+                        ],
+
+                        'bank_transfer' => [
+                            'bank' => 'bni'
+                        ]
+                    ];
+
+                    break;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | BRI Virtual Account
+                |--------------------------------------------------------------------------
+                */
+                case 'bri_va':
+
+                    $midtransPayload = [
+                        'payment_type' => 'bank_transfer',
+
+                        'transaction_details' => [
+                            'order_id' => $request->order_id,
+                            'gross_amount' => (int)$request->grand_total,
+                        ],
+
+                        'bank_transfer' => [
+                            'bank' => 'bri'
+                        ]
+                    ];
+
+                    break;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Mandiri Bill Payment
+                |--------------------------------------------------------------------------
+                */
+                case 'mandiri_va':
+
+                    $midtransPayload = [
+                        'payment_type' => 'echannel',
+
+                        'transaction_details' => [
+                            'order_id' => $request->order_id,
+                            'gross_amount' => (int)$request->grand_total,
+                        ],
+
+                        'echannel' => [
+                            'bill_info1' => 'Payment',
+                            'bill_info2' => 'Niaga Jaya Electronic'
+                        ]
+                    ];
+
+                    break;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Permata VA
+                |--------------------------------------------------------------------------
+                */
+                case 'permata_va':
+
+                    $midtransPayload = [
+                        'payment_type' => 'permata',
+
+                        'transaction_details' => [
+                            'order_id' => $request->order_id,
+                            'gross_amount' => (int)$request->grand_total,
+                        ]
+                    ];
+
+                    break;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | CIMB Niaga VA
+                |--------------------------------------------------------------------------
+                */
+                case 'cimb_va':
+
+                    $midtransPayload = [
+                        'payment_type' => 'bank_transfer',
+
+                        'transaction_details' => [
+                            'order_id' => $request->order_id,
+                            'gross_amount' => (int)$request->grand_total,
+                        ],
+
+                        'bank_transfer' => [
+                            'bank' => 'cimb'
+                        ]
+                    ];
+
+                    break;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | BSI VA
+                |--------------------------------------------------------------------------
+                */
+                case 'bsi_va':
+
+                    $midtransPayload = [
+                        'payment_type' => 'bank_transfer',
+
+                        'transaction_details' => [
+                            'order_id' => $request->order_id,
+                            'gross_amount' => (int)$request->grand_total,
+                        ],
+
+                        'bank_transfer' => [
+                            'bank' => 'bsi'
+                        ]
+                    ];
+
+                    break;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | SeaBank VA
+                |--------------------------------------------------------------------------
+                */
+                case 'seabank_va':
+
+                    $midtransPayload = [
+                        'payment_type' => 'bank_transfer',
+
+                        'transaction_details' => [
+                            'order_id' => $request->order_id,
+                            'gross_amount' => (int)$request->grand_total,
+                        ],
+
+                        'bank_transfer' => [
+                            'bank' => 'seabank'
+                        ]
+                    ];
+
+                    break;
+
+
+                default:
+
+                    throw new Exception("Metode pembayaran tidak didukung.");
+            }
+        
+
+
+
+            $midtransResponse = CoreApi::charge($midtransPayload);
+            
             DB::commit();
 
+            DB::table('pesanan')
+                ->where('id', $pesananId)
+                ->update([
+                    'payment_response' => json_encode($midtransResponse)
+                ]);
+
             return response()->json([
-                'message' => 'Pesanan berhasil dicatat di database lokal!',
-                'db_pesanan_id' => $pesananId
+                'success' => true,
+                'message' => 'Pesanan berhasil dibuat',
+
+                'order_id' => $request->order_id,
+
+                'payment_type' => $request->payment_type,
+
+                'payment_data' => $midtransResponse
+
             ], 201);
 
         } catch (\Exception $e) {
@@ -193,30 +467,61 @@ class OrderController extends Controller
      * Memperbarui status pesanan menjadi selesai (diterima oleh pembeli)
      */
     public function receiveOrder(Request $request, $id)
-{
-    try {
-        $pesanan = \App\Models\Pesanan::find($id);
+    {
+        try {
+            $pesanan = \App\Models\Pesanan::find($id);
+
+            if (!$pesanan) {
+                return response()->json(['message' => 'Pesanan tidak ditemukan.'], 404);
+            }
+
+            // Cukup update status_pengiriman saja
+            // Karena status pembayaran sudah dipegang oleh Midtrans
+            $pesanan->status_pengiriman = 'selesai'; 
+            
+            $pesanan->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesanan telah diterima oleh pembeli.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal mengupdate status',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function cancelOrder($id)
+    {
+        $pesanan = DB::table('pesanan')
+            ->where('id', $id)
+            ->first();
 
         if (!$pesanan) {
-            return response()->json(['message' => 'Pesanan tidak ditemukan.'], 404);
+            return response()->json([
+                'message' => 'Pesanan tidak ditemukan'
+            ], 404);
         }
 
-        // Cukup update status_pengiriman saja
-        // Karena status pembayaran sudah dipegang oleh Midtrans
-        $pesanan->status_pengiriman = 'selesai'; 
-        
-        $pesanan->save();
+        if ($pesanan->status_pembayaran !== 'menunggu') {
+            return response()->json([
+                'message' => 'Pesanan tidak dapat dibatalkan'
+            ], 400);
+        }
+
+        DB::table('pesanan')
+            ->where('id', $id)
+            ->update([
+                'status_pembayaran' => 'dibatalkan',
+                'updated_at' => now()
+            ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Pesanan telah diterima oleh pembeli.'
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Gagal mengupdate status',
-            'error' => $e->getMessage()
-        ], 500);
+            'message' => 'Pesanan berhasil dibatalkan'
+        ]);
     }
-}
 }
