@@ -1,124 +1,121 @@
 # 🛒 Niaga Jaya Electronic
 
 <p align="center">
-  <img src="niaga-jaya-admin\public\assets\images\niaga-jaya-logo.png" width="150">
+  <img src="niaga-jaya-admin/public/assets/images/niaga-jaya-logo.png" width="180">
 </p>
 
 <p align="center">
-Sistem Informasi Penjualan Elektronik Berbasis E-Commerce
+  <b>Electronic Store E-Commerce System</b>
+</p>
+
+<p align="center">
+
+![Laravel](https://img.shields.io/badge/Laravel-12-red?logo=laravel)
+![NextJS](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
+![Livewire](https://img.shields.io/badge/Livewire-4-purple)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-06B6D4?logo=tailwindcss)
+![MySQL](https://img.shields.io/badge/MySQL-Local-blue?logo=mysql)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase)
+![Midtrans](https://img.shields.io/badge/Midtrans-Payment_Gateway-blue)
+
 </p>
 
 ---
 
-## 📖 Tentang Project
+# 📖 About Project
 
 Niaga Jaya Electronic merupakan aplikasi **E-Commerce Penjualan Elektronik** yang dikembangkan untuk membantu proses penjualan produk elektronik secara online.
 
-Aplikasi ini menyediakan fitur pembelian produk, manajemen pesanan, pembayaran online menggunakan **Midtrans Payment Gateway**, serta dashboard admin untuk mengelola seluruh aktivitas toko.
-
-Project ini dibangun menggunakan:
-
-* Laravel 12
-* Next.js 16
-* Supabase PostgreSQL
-* Midtrans Payment Gateway
-* Tailwind CSS
-* Clerk Authentication
+Project ini memiliki fitur manajemen produk, checkout, pembayaran online menggunakan Midtrans, manajemen pesanan, dashboard admin, serta landing page perusahaan.
 
 ---
 
-# 👥 Role Pengguna
+# 📦 Repository Structure
+
+Repository ini terdiri dari **3 project**.
+
+| Folder | Description |
+|---------|-------------|
+| `niaga-jaya-admin` | Laravel Backend + Livewire Admin Dashboard |
+| `niaga-jaya-electronic-ecommerce` | Next.js 16 E-Commerce Frontend |
+| `niaga-jaya-company-profile` | Next.js 16 Company Profile Landing Page |
+
+---
+
+# 👥 User Roles
 
 ## 👤 User
 
-User dapat melakukan:
-
-* Registrasi / Login menggunakan Clerk
-* Melihat produk
-* Mencari produk
-* Melihat detail produk
-* Menambahkan produk ke keranjang
-* Checkout produk
-* Memilih metode pembayaran
-* Melakukan pembayaran melalui Midtrans
-* Melihat status pesanan
-* Melihat riwayat pembelian
-* Memberikan ulasan produk
+- Login / Register (Clerk)
+- Browse Products
+- Search Products
+- Product Detail
+- Shopping Cart
+- Checkout
+- Midtrans Payment
+- Order History
+- Payment Tracking
+- Product Review
 
 ---
 
 ## 👨‍💼 Admin
 
-Admin dapat melakukan:
-
-* Login Dashboard
-* Dashboard Statistik
-* Kelola Produk
-* Kelola Kategori
-* Kelola Brand
-* Kelola Pesanan
-* Update Status Pengiriman
-* Input Nomor Resi
-* Kelola Banner
-* Kelola Ulasan
-* Export Laporan PDF
+- Dashboard
+- Manage Product
+- Manage Brand
+- Manage Category
+- Manage Banner
+- Manage Orders
+- Shipping Management
+- Update Tracking Number
+- Product Review
+- Export PDF Report
 
 ---
 
-# 💳 Payment Gateway
+# 💳 Payment Method
 
-Project ini telah terintegrasi dengan **Midtrans Core API**.
+Project ini menggunakan **Midtrans Core API**
 
-Metode pembayaran yang tersedia:
+Metode pembayaran yang tersedia
 
-* QRIS
-* BCA Virtual Account
-* BNI Virtual Account
-* BRI Virtual Account
-* CIMB Virtual Account
-* Permata Virtual Account
+- QRIS
+- BCA Virtual Account
+- BNI Virtual Account
+- BRI Virtual Account
+- CIMB Virtual Account
+- Permata Virtual Account
 
 ---
 
-# 🛠️ Tech Stack
+# 🚀 Technology Stack
 
 ## Backend
 
-* Laravel 12
-* PHP 8.4
-* PostgreSQL (Supabase)
-* Livewire 4
+- Laravel 12
+- PHP 8.4
+- Livewire 4
 
 ## Frontend
 
-* Next.js
-* React
-* Tailwind CSS
-* Clerk Authentication
+- Next.js 16
+- React
+- Tailwind CSS
+- Clerk Authentication
+
+## Database
+
+- MySQL
+- PostgreSQL (Supabase)
 
 ## Payment
 
-* Midtrans Core API
+- Midtrans Core API
 
 ---
 
-# 📂 Struktur Project
-
-Backend
-
-```
-niaga-jaya-admin/
-```
-
-Frontend
-
-```
-niaga-jaya-user/
-```
-
----
-
-# ⚙️ Cara Instalasi
+# ⚙️ Installation
 
 ## Requirements
 
@@ -126,7 +123,7 @@ niaga-jaya-user/
 - Composer
 - Node.js 20+
 - Laragon / XAMPP
-- MySQL / phpMyAdmin
+- MySQL (phpMyAdmin) **or** Supabase PostgreSQL
 
 ---
 
@@ -140,41 +137,33 @@ git clone https://github.com/AgitElhandinnata/niaga-jaya-electronic.git
 
 ## 2. Backend Installation
 
-Masuk ke folder backend
-
 ```bash
 cd niaga-jaya-admin
-```
 
-Install dependency
-
-```bash
 composer install
-```
 
-Copy file environment
-
-```bash
 cp .env.example .env
-```
 
-Generate key
-
-```bash
 php artisan key:generate
 ```
 
 ---
 
-## 3. Konfigurasi Database
+# 🗄️ Database Configuration
 
-Buat database baru di phpMyAdmin dengan nama:
+Project ini mendukung **2 jenis database**.
+
+---
+
+## Option 1 — MySQL (Recommended for Local Development)
+
+Buat database baru
 
 ```
 niaga-jaya-electronic
 ```
 
-Kemudian ubah file `.env`
+Konfigurasi `.env`
 
 ```env
 DB_CONNECTION=mysql
@@ -185,77 +174,58 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-> **Catatan:** Jika menggunakan Laragon dan MySQL berjalan pada port `3307` atau port lain, sesuaikan nilai `DB_PORT` dengan konfigurasi MySQL Anda.
+> Jika menggunakan Laragon, sesuaikan `DB_PORT` (3306 / 3307 / 3308).
 
----
-
-## 4. Jalankan Migration
+Kemudian jalankan
 
 ```bash
 php artisan migrate
-```
 
----
-
-## 5. Jalankan Seeder (Opsional)
-
-Jika project menyediakan seeder:
-
-```bash
-php artisan db:seed
-```
-
-atau
-
-```bash
-php artisan migrate --seed
-```
-
----
-
-## 6. Storage Link
-
-```bash
 php artisan storage:link
-```
 
----
-
-## 7. Jalankan Backend
-
-```bash
 php artisan serve
 ```
 
-Backend akan berjalan di
+---
 
+## Option 2 — Supabase PostgreSQL
+
+Konfigurasi `.env`
+
+```env
+DB_CONNECTION=pgsql
+DB_HOST=YOUR_SUPABASE_HOST
+DB_PORT=6543
+DB_DATABASE=postgres
+DB_USERNAME=YOUR_USERNAME
+DB_PASSWORD=YOUR_PASSWORD
 ```
-http://127.0.0.1:8000
+
+Kemudian jalankan
+
+```bash
+php artisan migrate
+
+php artisan storage:link
+
+php artisan serve
 ```
 
 ---
 
-# Frontend Installation
+# 🌐 Frontend Installation
 
-Masuk ke folder frontend
+Masuk ke folder
 
 ```bash
 cd niaga-jaya-electronic-ecommerce
-```
 
-Install dependency
-
-```bash
 npm install
-```
 
-Jalankan project
-
-```bash
 npm run dev
 ```
 
-Frontend akan berjalan di
+Frontend
 
 ```
 http://localhost:3000
@@ -263,67 +233,146 @@ http://localhost:3000
 
 ---
 
-# Konfigurasi Midtrans
+# 🏢 Company Profile
 
-Tambahkan konfigurasi berikut pada file `.env`
+Masuk ke folder
+
+```bash
+cd niaga-jaya-company-profile
+
+npm install
+
+npm run dev
+```
+
+---
+
+# 🔑 Environment Variables
+
+## Midtrans
 
 ```env
 MIDTRANS_SERVER_KEY=
+
 MIDTRANS_CLIENT_KEY=
+
 MIDTRANS_IS_PRODUCTION=false
 ```
 
 ---
 
-# Konfigurasi Clerk
-
-Tambahkan konfigurasi berikut pada file `.env.local`
+## Clerk
 
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+
 CLERK_SECRET_KEY=
 ```
-# Screenshot
+
+---
+
+# 📸 Screenshots
 
 ## Landing Page
 
-(Gambar)
+<p align="center">
+<img src="screenshots/landing-page.png" width="800">
+</p>
 
-## Produk
+---
 
-(Gambar)
+## Product Page
+
+<p align="center">
+<img src="screenshots/product-page.png" width="800">
+</p>
+
+---
+
+## Product Detail
+
+<p align="center">
+<img src="screenshots/product-detail.png" width="800">
+</p>
+
+---
+
+## Shopping Cart
+
+<p align="center">
+<img src="screenshots/cart.png" width="800">
+</p>
+
+---
 
 ## Checkout
 
-(Gambar)
-
-## Pembayaran
-
-(Gambar)
-
-## Dashboard Admin
-
-(Gambar)
+<p align="center">
+<img src="screenshots/checkout.png" width="800">
+</p>
 
 ---
 
-# Fitur
+## Payment
 
-* Authentication
-* Product Management
-* Category Management
-* Brand Management
-* Shopping Cart
-* Checkout
-* Midtrans Payment Gateway
-* Order Tracking
-* Shipping Status
-* Product Review
-* PDF Report
-* Responsive Design
+<p align="center">
+<img src="screenshots/payment.png" width="800">
+</p>
 
 ---
 
-# License
+## Order History
 
-Project ini dibuat untuk kebutuhan pembelajaran dan pengembangan Sistem Informasi Penjualan Elektronik berbasis E-Commerce.
+<p align="center">
+<img src="screenshots/orders.png" width="800">
+</p>
+
+---
+
+## Admin Dashboard
+
+<p align="center">
+<img src="screenshots/dashboard.png" width="800">
+</p>
+
+---
+
+## Product Management
+
+<p align="center">
+<img src="screenshots/admin-product.png" width="800">
+</p>
+
+---
+
+## Order Management
+
+<p align="center">
+<img src="screenshots/admin-order.png" width="800">
+</p>
+
+---
+
+# ✨ Features
+
+- Authentication with Clerk
+- Product Management
+- Category Management
+- Brand Management
+- Shopping Cart
+- Checkout
+- Midtrans Integration
+- QRIS Payment
+- Virtual Account Payment
+- Shipping Management
+- Product Review
+- PDF Export
+- Responsive Design
+
+---
+
+# 📄 License
+
+This project was developed for educational purposes and portfolio showcase.
+
+© 2026 Agit Elhandinnata
