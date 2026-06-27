@@ -371,8 +371,18 @@ CLERK_SECRET_KEY=
 
 ---
 
+# 👨‍💻 Contributors
+
+This project was developed collaboratively by:
+
+- **Agit Elhandinnata**
+- **Fadhil Hidayattulloh**
+- **Felisa Vivian Margaretha**
+
+---
+
 # 📄 License
 
 This project was developed for educational purposes and portfolio showcase.
 
-© 2026 Agit Elhandinnata
+© 2026 Agit Elhandinnata, Fadhil Hidayattulloh, Felisa Vivian Margaretha. All Rights Reserved.
