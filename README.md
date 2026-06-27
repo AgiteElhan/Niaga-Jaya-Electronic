@@ -1,7 +1,7 @@
 # 🛒 Niaga Jaya Electronic
 
 <p align="center">
-  <img src="public/logo.png" width="150">
+  <img src="niaga-jaya-admin\public\assets\images\niaga-jaya-logo.png" width="150">
 </p>
 
 <p align="center">
@@ -19,7 +19,7 @@ Aplikasi ini menyediakan fitur pembelian produk, manajemen pesanan, pembayaran o
 Project ini dibangun menggunakan:
 
 * Laravel 12
-* Next.js 15
+* Next.js 16
 * Supabase PostgreSQL
 * Midtrans Payment Gateway
 * Tailwind CSS
