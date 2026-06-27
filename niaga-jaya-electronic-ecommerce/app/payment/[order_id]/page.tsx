@@ -139,8 +139,13 @@ export default function PaymentPage() {
                   <h3 className="font-bold text-gray-900 text-center mb-4 text-lg">
                     Scan QRIS
                   </h3>
-                  <div className="flex justify-center bg-white p-4 rounded-xl border border-gray-100 inline-block mx-auto w-fit">
-                    <QRCode value={paymentResponse.qr_string} size={220} />
+                  <div className="flex justify-center">
+                      <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                          <QRCode
+                              value={paymentResponse.qr_string}
+                              size={220}
+                          />
+                      </div>
                   </div>
                   
                   <div className="mt-5 text-sm text-gray-600 space-y-2">
