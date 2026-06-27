@@ -10,6 +10,7 @@ use App\Models\StokMasuk;
 use App\Models\StokMasukItem;
 use Illuminate\Support\Facades\DB;
 
+
 class Index extends Component
 {
     public function render()
@@ -41,16 +42,41 @@ class Index extends Component
             ->limit(5)
             ->get();
 
-        $salesData = \App\Models\Pesanan::selectRaw('MONTH(created_at) as month, SUM(total_bayar) as total')
-            ->whereYear('created_at', date('Y'))
+        $driver = DB::getDriverName();
+
+        if ($driver === 'pgsql') {
+
+            $salesData = Pesanan::selectRaw("
+                EXTRACT(MONTH FROM created_at) as month,
+                SUM(total_bayar) as total
+            ")
+            ->whereYear('created_at', now()->year)
+            ->groupByRaw("EXTRACT(MONTH FROM created_at)")
+            ->orderByRaw("EXTRACT(MONTH FROM created_at)")
+            ->pluck('total', 'month')
+            ->toArray();
+
+        } else {
+
+            $salesData = Pesanan::selectRaw("
+                MONTH(created_at) as month,
+                SUM(total_bayar) as total
+            ")
+            ->whereYear('created_at', now()->year)
             ->groupBy('month')
-            ->pluck('total', 'month')->toArray();
+            ->orderBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
+
+        }
 
         $salesChart = [];
+
         for ($i = 1; $i <= 12; $i++) {
             $salesChart[] = $salesData[$i] ?? 0;
         }
 
+    
         return view('livewire.admin.dashboard.index', [
             'totalProfit' => $totalProfit,
             'totalReturns' => $totalReturns,

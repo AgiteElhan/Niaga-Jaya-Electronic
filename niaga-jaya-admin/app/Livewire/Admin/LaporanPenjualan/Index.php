@@ -7,6 +7,7 @@ use App\Models\Pesanan;
 use App\Models\PesananItem;
 use Livewire\WithPagination;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 
 
 class Index extends Component
@@ -15,13 +16,12 @@ class Index extends Component
 
     public $search = '';
     public $paginate = 10;
+    
 
     public function updatingSearch() { $this->resetPage(); }
 
     public function exportPdf()
     {
-        // 1. Ambil data pesanan beserta relasi item dan produk
-        // Kita gunakan 'latest()' agar yang terbaru muncul di atas
         $pesananData = \App\Models\Pesanan::with(['items.product'])
             ->where('status_pengiriman', 'selesai')
             ->where(function ($query) {
@@ -31,10 +31,9 @@ class Index extends Component
             ->latest()
             ->get();
 
-        // 2. Load view laporan
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.laporan_penjualan', [
             'pesananData' => $pesananData
-        ])->setPaper('a4', 'landscape'); // <-- UBAH PORTRAIT MENJADI LANDSCAPE DI SINI
+        ])->setPaper('a4', 'landscape'); 
 
         // 3. Stream download
         return response()->streamDownload(function () use ($pdf) {
@@ -58,16 +57,17 @@ class Index extends Component
             });
         }
 
-        // 3. Ambil data dengan Eager Loading agar relasinya tidak NULL
-        $dataPenjualan = $query->with(['items.product']) // <--- INI KUNCI UTAMANYA!
+        $dataPenjualan = $query->with(['items.product']) 
                             ->latest()
-                            ->paginate($this->paginate);
+                            ->paginate((int) $this->paginate);
 
-        // 4. Statistik
         $statsQuery = clone $query;
-        $totalPendapatan = $statsQuery->sum('total_bayar');
-        $totalTransaksi  = $statsQuery->count();
-        $totalProduk     = \App\Models\PesananItem::whereIn('pesanan_id', $statsQuery->pluck('id'))->sum('jumlah');
+        $totalPendapatan = (clone $query)->sum('total_bayar');
+        $totalTransaksi = (clone $query)->count();
+        $totalProduk = PesananItem::whereIn(
+            'pesanan_id',
+            (clone $query)->pluck('id')
+        )->sum('jumlah');
 
         return view('livewire.admin.laporan-penjualan.index', [
             'dataPenjualan'   => $dataPenjualan,
