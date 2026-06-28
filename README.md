@@ -151,19 +151,60 @@ php artisan key:generate
 
 # 🗄️ Database Configuration
 
-Project ini mendukung **2 jenis database**.
+Project ini mendukung **2 jenis database**, yaitu **MySQL (phpMyAdmin)** dan **Supabase PostgreSQL**.
 
 ---
 
-## Option 1 — MySQL (Recommended for Local Development)
+# Option 1 — MySQL (Import Database)
 
-Buat database baru
+**Recommended for Local Development**
 
+Project ini telah menyediakan file database pada folder:
+
+```text
+database/
+└── niaga-jaya-electronic.sql
 ```
+
+### 1. Buat Database
+
+Buka **phpMyAdmin** kemudian buat database baru dengan nama:
+
+```text
 niaga-jaya-electronic
 ```
 
-Konfigurasi `.env`
+---
+
+### 2. Import Database
+
+Pilih database yang baru dibuat kemudian klik menu
+
+```
+Import
+```
+
+Pilih file
+
+```
+database/niaga-jaya-electronic.sql
+```
+
+Kemudian klik
+
+```
+Go
+```
+
+Tunggu hingga proses import selesai.
+
+---
+
+### 3. Konfigurasi Environment
+
+Buka file `.env`
+
+Sesuaikan konfigurasi database.
 
 ```env
 DB_CONNECTION=mysql
@@ -174,44 +215,86 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-> Jika menggunakan Laragon, sesuaikan `DB_PORT` (3306 / 3307 / 3308).
+> Jika menggunakan Laragon, sesuaikan port MySQL (3306 / 3307 / 3308).
 
-Kemudian jalankan
+---
+
+### 4. Storage Link
 
 ```bash
-php artisan migrate
-
 php artisan storage:link
-
-php artisan serve
 ```
 
 ---
 
-## Option 2 — Supabase PostgreSQL
+### 5. Jalankan Backend
 
-Konfigurasi `.env`
+```bash
+php artisan serve
+```
+
+Backend akan berjalan di
+
+```
+http://127.0.0.1:8000
+```
+
+---
+
+# Option 2 — Supabase PostgreSQL
+
+Jika ingin menggunakan PostgreSQL melalui Supabase, project dapat dijalankan menggunakan Laravel Migration.
+
+### 1. Buat Project Supabase
+
+Buat project baru pada dashboard Supabase.
+
+---
+
+### 2. Konfigurasi Environment
+
+Buka file `.env`
 
 ```env
 DB_CONNECTION=pgsql
 DB_HOST=YOUR_SUPABASE_HOST
 DB_PORT=6543
 DB_DATABASE=postgres
-DB_USERNAME=YOUR_USERNAME
-DB_PASSWORD=YOUR_PASSWORD
-```
-
-Kemudian jalankan
-
-```bash
-php artisan migrate
-
-php artisan storage:link
-
-php artisan serve
+DB_USERNAME=YOUR_SUPABASE_USERNAME
+DB_PASSWORD=YOUR_SUPABASE_PASSWORD
 ```
 
 ---
+
+### 3. Jalankan Migration
+
+```bash
+php artisan migrate
+```
+
+---
+
+### 4. Storage Link
+
+```bash
+php artisan storage:link
+```
+
+---
+
+### 5. Jalankan Backend
+
+```bash
+php artisan serve
+```
+
+Backend akan berjalan di
+
+```
+http://127.0.0.1:8000
+```
+
+
 
 # 🌐 Frontend Installation
 
