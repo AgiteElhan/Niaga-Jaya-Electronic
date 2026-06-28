@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3307
--- Generation Time: Jun 27, 2026 at 05:53 AM
+-- Generation Time: Jun 28, 2026 at 08:56 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.4.14
 
@@ -306,7 +306,8 @@ INSERT INTO `pesanan` (`id`, `nomor_pesanan`, `clerk_id`, `nama_pembeli`, `whats
 (73, 'NJE-1782537789632', 'user_3EISCAnxbfrC2lz7ecttYmbck1U', 'Agit elhandinnata', '081234567857', 'Perumahan Bumi Asri Pasarkemis Blok B3 No. 24, RT 02/RW 08, Pasar Kemis, Kabupaten Tangerang, Banten', 'J&T Cargo - Regular', 'belum_dikirim', '387499.00', 'pending', 'bank_transfer', NULL, NULL, NULL, '2026-06-27 05:23:10', '2026-06-27 05:23:13', NULL, '{\"status_code\":\"201\",\"status_message\":\"Success, PERMATA VA transaction is successful\",\"transaction_id\":\"e3e294cd-1480-49bd-9488-48b140c886fe\",\"order_id\":\"NJE-1782537789632\",\"merchant_id\":\"M784362039\",\"gross_amount\":\"387499.00\",\"currency\":\"IDR\",\"payment_type\":\"bank_transfer\",\"transaction_time\":\"2026-06-27 12:23:11\",\"transaction_status\":\"pending\",\"fraud_status\":\"accept\",\"permata_va_number\":\"6200049747867398\",\"expiry_time\":\"2026-06-28 12:23:11\"}'),
 (74, 'NJE-1782537849328', 'user_3EISCAnxbfrC2lz7ecttYmbck1U', 'Agit elhandinnata', '081234567857', 'Perumahan Bumi Asri Pasarkemis Blok B3 No. 24, RT 02/RW 08, Pasar Kemis, Kabupaten Tangerang, Banten', 'J&T Cargo - Regular', 'belum_dikirim', '387499.00', 'success', 'bank_transfer', NULL, NULL, NULL, '2026-06-27 05:24:10', '2026-06-27 05:26:07', NULL, '{\"status_code\":\"201\",\"status_message\":\"Success, Bank Transfer transaction is created\",\"transaction_id\":\"51751dc3-0a3c-445b-905f-b3951f22e3a5\",\"order_id\":\"NJE-1782537849328\",\"merchant_id\":\"M784362039\",\"gross_amount\":\"387499.00\",\"currency\":\"IDR\",\"payment_type\":\"bank_transfer\",\"transaction_time\":\"2026-06-27 12:24:11\",\"transaction_status\":\"pending\",\"fraud_status\":\"accept\",\"va_numbers\":[{\"bank\":\"bsi\",\"va_number\":\"62039179312991434\"}],\"expiry_time\":\"2026-06-28 12:24:11\"}'),
 (75, 'NJE-1782538037933', 'user_3EISCAnxbfrC2lz7ecttYmbck1U', 'Agit elhandinnata', '081234567857', 'Perumahan Bumi Asri Pasarkemis Blok B3 No. 24, RT 02/RW 08, Pasar Kemis, Kabupaten Tangerang, Banten', 'J&T Cargo - Regular', 'selesai', '387499.00', 'success', 'bank_transfer', 'rxhahh123', NULL, NULL, '2026-06-27 05:27:19', '2026-06-27 05:28:29', NULL, '{\"status_code\":\"201\",\"status_message\":\"Success, Bank Transfer transaction is created\",\"transaction_id\":\"b6b9b3df-839f-4100-a66a-7ef6cf51bf9d\",\"order_id\":\"NJE-1782538037933\",\"merchant_id\":\"M784362039\",\"gross_amount\":\"387499.00\",\"currency\":\"IDR\",\"payment_type\":\"bank_transfer\",\"transaction_time\":\"2026-06-27 12:27:20\",\"transaction_status\":\"pending\",\"fraud_status\":\"accept\",\"va_numbers\":[{\"bank\":\"cimb\",\"va_number\":\"2039558210133246\"}],\"expiry_time\":\"2026-06-28 12:27:19\"}'),
-(76, 'NJE-1782538211738', 'user_3EISCAnxbfrC2lz7ecttYmbck1U', 'Agit elhandinnata', '081234567857', 'Perumahan Bumi Asri Pasarkemis Blok B3 No. 24, RT 02/RW 08, Pasar Kemis, Kabupaten Tangerang, Banten', 'J&T Cargo - Regular', 'dikirim', '3027499.00', 'success', 'bank_transfer', 'rx123456', NULL, NULL, '2026-06-27 05:30:13', '2026-06-27 05:34:31', NULL, '{\"status_code\":\"201\",\"status_message\":\"Success, Bank Transfer transaction is created\",\"transaction_id\":\"0d05377b-737a-4f4d-8462-156b5ba2a5e9\",\"order_id\":\"NJE-1782538211738\",\"merchant_id\":\"M784362039\",\"gross_amount\":\"3027499.00\",\"currency\":\"IDR\",\"payment_type\":\"bank_transfer\",\"transaction_time\":\"2026-06-27 12:30:13\",\"transaction_status\":\"pending\",\"fraud_status\":\"accept\",\"va_numbers\":[{\"bank\":\"bni\",\"va_number\":\"9886203948412431\"}],\"expiry_time\":\"2026-06-28 12:30:13\"}');
+(76, 'NJE-1782538211738', 'user_3EISCAnxbfrC2lz7ecttYmbck1U', 'Agit elhandinnata', '081234567857', 'Perumahan Bumi Asri Pasarkemis Blok B3 No. 24, RT 02/RW 08, Pasar Kemis, Kabupaten Tangerang, Banten', 'J&T Cargo - Regular', 'dikirim', '3027499.00', 'success', 'bank_transfer', 'rx123456', NULL, NULL, '2026-06-27 05:30:13', '2026-06-27 05:34:31', NULL, '{\"status_code\":\"201\",\"status_message\":\"Success, Bank Transfer transaction is created\",\"transaction_id\":\"0d05377b-737a-4f4d-8462-156b5ba2a5e9\",\"order_id\":\"NJE-1782538211738\",\"merchant_id\":\"M784362039\",\"gross_amount\":\"3027499.00\",\"currency\":\"IDR\",\"payment_type\":\"bank_transfer\",\"transaction_time\":\"2026-06-27 12:30:13\",\"transaction_status\":\"pending\",\"fraud_status\":\"accept\",\"va_numbers\":[{\"bank\":\"bni\",\"va_number\":\"9886203948412431\"}],\"expiry_time\":\"2026-06-28 12:30:13\"}'),
+(77, 'NJE-1782540964771', 'user_3EISCAnxbfrC2lz7ecttYmbck1U', 'Agit elhandinnata', '081234567857', 'Perumahan Bumi Asri Pasarkemis Blok B3 No. 24, RT 02/RW 08, Pasar Kemis, Kabupaten Tangerang, Banten', 'J&T Cargo - Regular', 'belum_dikirim', '387499.00', 'menunggu', 'qris', NULL, NULL, NULL, '2026-06-27 06:16:05', '2026-06-27 06:16:05', NULL, '{\"status_code\":\"201\",\"status_message\":\"Qris transaction is created\",\"transaction_id\":\"7e567cf8-f154-4deb-a940-afeffe1872c2\",\"order_id\":\"NJE-1782540964771\",\"merchant_id\":\"M784362039\",\"gross_amount\":\"387499.00\",\"currency\":\"IDR\",\"payment_type\":\"qris\",\"transaction_time\":\"2026-06-27 13:16:06\",\"transaction_status\":\"pending\",\"fraud_status\":\"accept\",\"actions\":[{\"name\":\"generate-qr-code\",\"method\":\"GET\",\"url\":\"https:\\/\\/api.sandbox.midtrans.com\\/v2\\/qris\\/7e567cf8-f154-4deb-a940-afeffe1872c2\\/qr-code\"},{\"name\":\"generate-qr-code-v2\",\"method\":\"GET\",\"url\":\"https:\\/\\/merchants-app.sbx.midtrans.com\\/v4\\/qris\\/gopay\\/A120260627061606Gtjmcteim2ID\\/qr-code\"}],\"acquirer\":\"gopay\",\"qr_string\":\"00020101021226620014COM.GO-JEK.WWW011993600914378436203970210M7843620390303UKE51440014ID.CO.QRIS.WWW0215AID6273979873550303UKE52043745530336054063874995802ID5921Niaga Jaya Elektronik6007BANDUNG61054012162395028A120260627061606Gtjmcteim2ID0703A016304C6F1\",\"expiry_time\":\"2026-06-27 13:31:06\"}');
 
 -- --------------------------------------------------------
 
@@ -400,7 +401,8 @@ INSERT INTO `pesanan_item` (`id`, `pesanan_id`, `produk_id`, `jumlah`, `harga_sa
 (81, 73, 4, 1, '359999.00', '359999.00', '2026-06-27 05:23:10', '2026-06-27 05:23:10'),
 (82, 74, 4, 1, '359999.00', '359999.00', '2026-06-27 05:24:10', '2026-06-27 05:24:10'),
 (83, 75, 4, 1, '359999.00', '359999.00', '2026-06-27 05:27:19', '2026-06-27 05:27:19'),
-(84, 76, 3, 1, '2999999.00', '2999999.00', '2026-06-27 05:30:13', '2026-06-27 05:30:13');
+(84, 76, 3, 1, '2999999.00', '2999999.00', '2026-06-27 05:30:13', '2026-06-27 05:30:13'),
+(85, 77, 4, 1, '359999.00', '359999.00', '2026-06-27 06:16:05', '2026-06-27 06:16:05');
 
 -- --------------------------------------------------------
 
@@ -453,8 +455,11 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+('4ZsVimqwDaLsydUuBRFCpR5jG910AN4cWQwnTJTK', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQWVwV0hTV1hodUdhMzJVUlgxVmRJNlZ3emFURGl1Y2pIVExDeXV0VSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1782625257),
 ('GjjufOBJbzF5nhOOQdv6u2QzRwJxm3uzvHTh1QZU', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiVVBJM2xVejQxRGdibjBhckpsaXFsRXdGM0cyZFBsZ2hhWFpYeUZYWCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9wZXNhbmFuIjtzOjU6InJvdXRlIjtzOjEzOiJhZG1pbi5wZXNhbmFuIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1782538493),
-('Hf6n78JPRi5fT9Wu5KTFHnjQvbeUpcDHmJhHUwPG', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoieGxrNE9pRm92RkZvc0hGYVF3TTdVSkQwaXdMMFJQdGE1SXREc2VCUSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9sYXBvcmFuLXN0b2siO3M6NToicm91dGUiO3M6MTg6ImFkbWluLmxhcG9yYW4tc3RvayI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1782283279);
+('Hf6n78JPRi5fT9Wu5KTFHnjQvbeUpcDHmJhHUwPG', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoieGxrNE9pRm92RkZvc0hGYVF3TTdVSkQwaXdMMFJQdGE1SXREc2VCUSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9sYXBvcmFuLXN0b2siO3M6NToicm91dGUiO3M6MTg6ImFkbWluLmxhcG9yYW4tc3RvayI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1782283279),
+('NioW5ylQqRzethTYStxWpLB1LCa0mEXSgPyJFRI3', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicWdqMXhCMUNFVkRMSFNUcm1UcGc1NHFVZkNtYVFtQ2UxbXk2bjc5QyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1782625236),
+('vRRfDf0iZMj6Uj2D2OSnCqaZeQ3vXZbLQiVIuQgR', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiYmlFdnJsS09IUzdtQmN3THF1WUNDZzBhSlJmdFFNbzJ0NnVEaktRRiI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czozNzoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL2Rhc2hib2FyZCI7fXM6OToiX3ByZXZpb3VzIjthOjI6e3M6MzoidXJsIjtzOjIxOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1782544270);
 
 -- --------------------------------------------------------
 
@@ -589,7 +594,10 @@ INSERT INTO `users` (`id`, `name`, `email`, `clerk_id`, `email_verified_at`, `ro
 (1, 'Admin Niaga Jaya', 'admin@gmail.com', NULL, NULL, 'admin', '$2y$12$fyBET5SWQPNiSR5atxG5geK86LY4mm7WMPmIQ60JU44xj0ErCpBLS', NULL, '2026-04-28 07:58:07', '2026-04-28 07:58:07'),
 (2, 'John Doe', 'user_2g7np7Hrk0SN6kj5EDMLDaKNL0S@niagajaya.com', 'user_2g7np7Hrk0SN6kj5EDMLDaKNL0S', NULL, 'user', '$2y$12$Z.c4v7PEAT9nVhbEs5jHxuZ1h/Tuseo4I0v.RCq2bMLMlOaDbpln6', NULL, '2026-05-18 15:43:39', '2026-05-18 15:43:39'),
 (3, 'Agit elhandinnata', 'agitelhan@gmail.com', 'user_3Du8WhOt4usF6Fw8zCNf21FzjdG', NULL, 'user', '$2y$12$D/XVuOyOctO3poBqVP4k2e8jfmqsfGhDb7n2TDhceAVJ8TD63f7/u', NULL, '2026-05-18 16:10:36', '2026-05-18 16:10:36'),
-(4, 'agit 02', 'agit02394@gmail.com', 'user_3Du8qkAWrkrrGf7skAN5URvT7Cr', NULL, 'user', '$2y$12$z5W1KxMgK2rXYfoYlBWHw.v8b4PPP2vnuDe0F6xz1UPjL5H1CDZH2', NULL, '2026-05-18 16:13:06', '2026-05-18 16:13:06');
+(4, 'agit 02', 'agit02394@gmail.com', 'user_3Du8qkAWrkrrGf7skAN5URvT7Cr', NULL, 'user', '$2y$12$z5W1KxMgK2rXYfoYlBWHw.v8b4PPP2vnuDe0F6xz1UPjL5H1CDZH2', NULL, '2026-05-18 16:13:06', '2026-05-18 16:13:06'),
+(6, 'fadil niagajaya', 'niagajayafadil@gmail.com', 'user_3Fl51L6YhNUbYzwuSJvy9F0Nntt', NULL, 'user', '$2y$12$CiDACFPg9lTSbwiD7MYfauoKQusWo9jC9.liK9xrOjc187ejPYWsq', NULL, '2026-06-28 08:49:58', '2026-06-28 08:49:58'),
+(7, 'User Niaga Jaya', 'clerk_user_3Fl55JgKPLSy8UXopalkUVS2Ddg@niagajaya.com', 'user_3Fl55JgKPLSy8UXopalkUVS2Ddg', NULL, 'user', '$2y$12$vI20qWzrote/TqGvKDvbtuupAbL51J3KkaaLT7F29UTyhLhokT1vC', NULL, '2026-06-28 08:50:28', '2026-06-28 08:50:28'),
+(8, 'felisa niagajaya', 'niagajayafelisa@gmail.com', 'user_3Fl55JgKPLSy8UXopalkUVS2Ddg', NULL, 'user', '$2y$12$0wdi3L0sPeyM1HV2s.sGz..RdRhUNEO3E.LZsvwFsxSCun1ffNgiC', NULL, '2026-06-28 08:50:29', '2026-06-28 08:50:29');
 
 --
 -- Indexes for dumped tables
@@ -771,13 +779,13 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `pesanan`
 --
 ALTER TABLE `pesanan`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- AUTO_INCREMENT for table `pesanan_item`
 --
 ALTER TABLE `pesanan_item`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
 
 --
 -- AUTO_INCREMENT for table `product`
@@ -813,7 +821,7 @@ ALTER TABLE `ulasan`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
