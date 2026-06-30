@@ -181,13 +181,13 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
             setOrder(prev => prev ? { ...prev, status_pembayaran: "success", status_pesanan: "success" } : prev);
           },
           onPending: function () {
-            toast.info("Menunggu Anda menyelesaikan pembayaran...");
+            toast("Menunggu Anda menyelesaikan pembayaran...");
           },
           onError: function () {
             toast.error("Pembayaran Gagal / Ditolak.");
           },
           onClose: function () {
-            toast.warning("Popup ditutup. Anda masih bisa membayar nanti.");
+            toast("Popup ditutup. Anda masih bisa membayar nanti.");
           }
         });
       } else {
