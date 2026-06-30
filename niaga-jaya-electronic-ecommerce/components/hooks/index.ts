@@ -16,7 +16,7 @@ export function useOutsideClick<T extends HTMLElement>(callback: () => void): Re
     
     // Bersihkan event listener saat unmount (cleanup)
     return () => {
-      document.remove("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [callback]);
 
