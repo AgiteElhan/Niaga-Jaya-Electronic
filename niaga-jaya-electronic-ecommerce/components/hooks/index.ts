@@ -1,20 +1,17 @@
-import { useEffect, useRef, RefObject } from "react";
+import { useEffect, useRef } from "react";
 
-export function useOutsideClick<T extends HTMLElement>(callback: () => void): RefObject<T> {
-  const ref = useRef<T>(null);
+export function useOutsideClick<T extends HTMLElement>(callback: () => void) {
+  const ref = useRef<T | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Jika ref ada dan yang diklik BUKAN bagian dari elemen tersebut
       if (ref.current && !ref.current.contains(event.target as Node)) {
         callback();
       }
     };
 
-    // Tambahkan event listener saat mount
     document.addEventListener("mousedown", handleClickOutside);
-    
-    // Bersihkan event listener saat unmount (cleanup)
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
