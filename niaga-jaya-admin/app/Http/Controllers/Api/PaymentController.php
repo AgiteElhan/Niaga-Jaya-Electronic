@@ -20,6 +20,13 @@ class PaymentController extends Controller
         }
         $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
 
+        Log::info('MIDTRANS DEBUG', [
+            'request' => $request->all(),
+            'server_key' => $serverKey,
+            'local_hash' => $hashed,
+        ]);
+
+        Log::info('Signature dari Midtrans: ' . $request->signature_key);
         if ($hashed !== $request->signature_key) {
             Log::error('Midtrans Callback: Invalid Signature Key');
             return response()->json(['message' => 'Invalid signature'], 403);
