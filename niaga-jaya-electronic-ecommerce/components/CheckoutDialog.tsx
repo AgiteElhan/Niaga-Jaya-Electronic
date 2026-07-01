@@ -197,8 +197,9 @@ export default function CheckoutDialog({ products = [], isFromCart = false }: Ch
       setIsSubmitting(true);
       toast.info("Memproses Pesanan...");
 
-      const laravelResponse = await fetch('https://niagajayaelectronic-admin.se2.web.id/api/orders', {
-        method: "POST",
+      const laravelResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/orders`,{
+      method: "POST",
         headers: { 
           "Content-Type": "application/json",
           "Accept": "application/json"

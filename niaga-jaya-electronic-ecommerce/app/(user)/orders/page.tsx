@@ -39,7 +39,7 @@ export default function OrdersPage() {
 
       try {
         const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;        
-        const response = await fetch(`${BACKEND_URL}/api/orders?clerk_id=${user.id}`);
+        const response = await fetch(`${BACKEND_URL}/orders?clerk_id=${user.id}`);
         
         if (response.ok) {
           const result = await response.json();

@@ -16,7 +16,7 @@ export default function PaymentPage() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `https://niagajayaelectronic-admin.se2.web.id/api/payment/${orderId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/payment/${orderId}`
       );
       const data = await res.json();
       setPayment(data);

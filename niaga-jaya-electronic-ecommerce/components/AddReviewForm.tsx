@@ -23,8 +23,8 @@ export default function AddReviewForm({ order, productId, onSuccess }: AddReview
     setIsSubmitting(true);
 
     try {
-      
-      const response = await fetch('https://niagajayaelectronic-admin.se2.web.id/api/reviews', {
+      const response = await  fetch(
+       '${process.env.NEXT_PUBLIC_API_URL}/reviews', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -9,7 +9,7 @@ export async function GET(
     const { id } = await params;
 
     // 2. Ambil data dari Laravel
-    const response = await fetch(`http://127.0.0.1:8000/api/products/${id}`, {
+    const response = await  fetch(`https://niagajayaelectronic-admin.se2.web.id/api/products/${id}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',

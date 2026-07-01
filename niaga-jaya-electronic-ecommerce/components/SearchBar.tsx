@@ -23,7 +23,7 @@ const SearchBar = () => {
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`);
         const data = await response.json();
         setAllProducts(data);
       } catch (error) {

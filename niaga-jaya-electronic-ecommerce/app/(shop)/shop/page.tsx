@@ -44,12 +44,12 @@ useEffect(() => {
     const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;
 
       // Fetch Produk
-      const resProducts = await fetch(`${BACKEND_URL}/api/products`);
+      const resProducts = await fetch(`${BACKEND_URL}/products`);
       const productsData = await resProducts.json();
       setProducts(Array.isArray(productsData) ? productsData : (productsData.data || []));
 
       // Fetch Kategori & Merk (API Baru)
-      const resFilters = await fetch(`${BACKEND_URL}/api/filters`);
+      const resFilters = await fetch(`${BACKEND_URL}/filters`);
       const filters = await resFilters.json();
       
       // Update state dari data master

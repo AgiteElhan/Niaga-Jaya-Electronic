@@ -9,7 +9,7 @@ import Link from 'next/link';
 // 1. Fungsi untuk mengambil data dari API Route Next.js
 async function getProducts() {
   // Kita panggil endpoint internal yang ada di app/api/products/route.ts
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
     cache: "no-store", // Agar data stok/harga selalu fresh dari database Niaga Jaya
   });
 

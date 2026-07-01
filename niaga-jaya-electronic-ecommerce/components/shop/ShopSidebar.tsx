@@ -29,7 +29,7 @@ const ShopSidebar = ({ onCategoryChange, onPriceChange }: ShopSidebarProps) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`);
         const data = await response.json();
         setCategories(data);
       } catch (error) {

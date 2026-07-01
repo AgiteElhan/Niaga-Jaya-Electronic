@@ -28,8 +28,8 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const BACKEND_URL = "https://niagajayaelectronic-admin.se2.web.id"; 
-        const response = await fetch(`${BACKEND_URL}/api/products/${productId}/reviews`);
+        const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;
+        const response = await fetch(`${BACKEND_URL}/products/${productId}/reviews`);
         if (response.ok) {
           const result = await response.json();
           setReviews(result.data || []);

@@ -108,7 +108,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
 
       try {
         const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;
-        const response = await fetch(`${BACKEND_URL}/api/orders/${orderIdFromUrl}?clerk_id=${user.id}`);
+        const response = await fetch(`${BACKEND_URL}/orders/${orderIdFromUrl}?clerk_id=${user.id}`);
         
         if (response.ok) {
           const result = await response.json();
@@ -213,8 +213,8 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
     setIsUpdatingStatus(true);  
 
     try {
-      const BACKEND_URL = "https://niagajayaelectronic-admin.se2.web.id";
-      const response = await fetch(`${BACKEND_URL}/api/orders/${order?.id}/receive`, {
+    const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;
+      const response = await fetch(`${BACKEND_URL}orders/${order?.id}/receive`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({ clerk_id: user?.id })
@@ -240,7 +240,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
     
     setIsSubmitting(true);
     try {
-      const BACKEND_URL = "https://niagajayaelectronic-admin.se2.web.id";
+    const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;
       const payload = {
         pesanan_id: order?.id,
         produk_id: order?.items && order.items.length > 0 ? (order.items[0].product_id || order.items[0].id) : null,
@@ -249,7 +249,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
         komentar: reviewComment
       };
 
-      const response = await fetch(`${BACKEND_URL}/api/reviews`, {
+      const response = await fetch(`${BACKEND_URL}/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify(payload)
