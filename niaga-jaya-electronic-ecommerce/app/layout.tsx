@@ -23,13 +23,6 @@ const figtree = Figtree({
   variable: "--font-figtree",
 });
 
-export const metadata: Metadata = {
-  title: "Niaga Jaya Electronic",
-  description: "Toko Elektronik Terpercaya di Tangerang",
-  icons: {
-    icon: "/favicon.png",
-  },
-};
 
 
 export default function RootLayout({
