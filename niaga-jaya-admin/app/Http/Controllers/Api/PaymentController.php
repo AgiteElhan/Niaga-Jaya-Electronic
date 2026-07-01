@@ -11,7 +11,11 @@ class PaymentController extends Controller
 {
     public function handleCallback(Request $request)
     {
-
+        Log::info('CALLBACK MASUK', [
+    'headers' => $request->headers->all(),
+    'body' => $request->getContent(),
+    'parsed' => $request->all(),
+]);
         $serverKey = config('services.midtrans.serverKey');
 
         if (!$serverKey) {
