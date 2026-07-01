@@ -41,7 +41,7 @@ export default function HeroSection() {
               Semua Keluarga
             </p>
             <a
-              href="http://localhost:3000/" 
+              href="https://niagajayaelectronic-ecommerce.se2.web.id/" 
               target="_blank"
               className="inline-block bg-[#2563EB] hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-full shadow-lg transition-all active:scale-95"
             >

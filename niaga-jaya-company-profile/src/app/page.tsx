@@ -8,30 +8,28 @@ import ScrollHandler from "@/components/ScrollHandler";
 import { Suspense } from "react";
 
 
-// Fetch banners dari Laravel
 async function getBanners() {
-  try {
-    const res = await fetch("http://localhost:8000/api/banners", {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/banners`,
+    {
       cache: "no-store",
-    });
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
+    }
+  );
+
+  if (!res.ok) return [];
+  return res.json();
 }
 
-// Fetch produk dari Laravel
-async function getProducts(): Promise<Product[]> {
-  try {
-    const res = await fetch("http://localhost:8000/api/products", {
+async function getProducts() {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/products`,
+    {
       cache: "no-store",
-    });
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
+    }
+  );
+
+  if (!res.ok) return [];
+  return res.json();
 }
 
 export default async function LandingPage() {
@@ -123,7 +121,7 @@ export default async function LandingPage() {
 
             {/* Button Lihat Semua Produk */}
             <div className="mt-12 flex justify-center" data-aos="fade-up">
-              <a href="http://localhost:3000/" target="_blank"
+              <a href="href=https://niagajayaelectronic-ecommerce.se2.web.id/shop" target="_blank"
                 className="group flex items-center gap-2 bg-white border-2 border-[#2563EB] text-[#2563EB] px-8 py-3 rounded-full font-bold hover:bg-[#2563EB] hover:text-white transition-all active:scale-95 shadow-md">
                 Lihat Semua Produk
                 <svg
@@ -167,7 +165,7 @@ export default async function LandingPage() {
 
           <div className="flex flex-col items-center gap-4">
             <a
-              href="http://localhost:3000/"
+              href="https://niagajayaelectronic-ecommerce.se2.web.id/shop"
               target="_blank"
               className="bg-[#2563EB] text-white px-12 py-4 rounded-full font-bold text-lg hover:bg-blue-700 transition-all w-full md:w-auto shadow-[0_10px_20px_rgba(37,99,235,0.3)] active:scale-95 text-center flex items-center justify-center gap-2"
             >
