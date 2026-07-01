@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Midtrans\Config;
 use Midtrans\CoreApi;
 use Illuminate\Support\Facades\DB;
+use Exception;
 
 class OrderController extends Controller
 {
@@ -197,10 +198,10 @@ class OrderController extends Controller
                 ]);
             }
 
-            Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-            Config::$isProduction = false;
-            Config::$isSanitized = true;
-            Config::$is3ds = true;
+            Config::$serverKey = config('services.midtrans.serverKey');
+            Config::$isProduction = config('services.midtrans.isProduction');
+            Config::$isSanitized = config('services.midtrans.isSanitized');
+            Config::$is3ds = config('services.midtrans.is3ds');
 
             $midtransPayload = [];
 
@@ -412,8 +413,7 @@ class OrderController extends Controller
 
             \Log::info('MIDTRANS PAYLOAD', $midtransPayload);
 
-            $midtransResponse = CoreApi::charge($midtransPayload);
-            \Log::info('MIDTRANS CONFIG', [
+         \Log::info('MIDTRANS CONFIG', [
     'server_key' => \Midtrans\Config::$serverKey,
     'is_production' => \Midtrans\Config::$isProduction,
     'merchant_id' => config('services.midtrans.merchantId'),
@@ -421,7 +421,9 @@ class OrderController extends Controller
 
 \Log::info('MIDTRANS PAYLOAD', $midtransPayload);
 
-            \Log::info('MIDTRANS RESPONSE', json_decode(json_encode($midtransResponse), true));            
+$midtransResponse = CoreApi::charge($midtransPayload);
+
+\Log::info('MIDTRANS RESPONSE', json_decode(json_encode($midtransResponse), true));           
             DB::commit();
 
             DB::table('pesanan')
