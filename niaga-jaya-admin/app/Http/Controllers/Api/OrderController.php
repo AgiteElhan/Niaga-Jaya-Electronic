@@ -421,6 +421,12 @@ class OrderController extends Controller
 
 \Log::info('MIDTRANS PAYLOAD', $midtransPayload);
 
+dd([
+    'config' => config('services.midtrans'),
+    'serverKey' => \Midtrans\Config::$serverKey,
+    'clientKey' => config('services.midtrans.clientKey'),
+]);
+
 $midtransResponse = CoreApi::charge($midtransPayload);
 
 \Log::info('MIDTRANS RESPONSE', json_decode(json_encode($midtransResponse), true));           
