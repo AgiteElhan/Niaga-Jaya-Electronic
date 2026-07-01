@@ -124,7 +124,7 @@ export default async function LandingPage() {
 
             {/* Button Lihat Semua Produk */}
             <div className="mt-12 flex justify-center" data-aos="fade-up">
-              <a href="href=https://niagajayaelectronic-ecommerce.se2.web.id/shop" target="_blank"
+              <a href="https://niagajayaelectronic-ecommerce.se2.web.id/shop" target="_blank"
                 className="group flex items-center gap-2 bg-white border-2 border-[#2563EB] text-[#2563EB] px-8 py-3 rounded-full font-bold hover:bg-[#2563EB] hover:text-white transition-all active:scale-95 shadow-md">
                 Lihat Semua Produk
                 <svg
