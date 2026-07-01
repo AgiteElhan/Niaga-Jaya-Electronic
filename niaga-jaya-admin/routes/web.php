@@ -90,4 +90,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/test-midtrans-config', function () {
+    return response()->json([
+        'config' => config('services.midtrans'),
+        'env_server' => env('MIDTRANS_SERVER_KEY'),
+    ]);
+});
 require __DIR__.'/auth.php';
