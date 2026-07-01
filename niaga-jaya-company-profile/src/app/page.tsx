@@ -20,7 +20,7 @@ async function getBanners() {
   return res.json();
 }
 
-async function getProducts() {
+async function getProducts(): Promise<Product[]> {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/products`,
     {
@@ -29,7 +29,10 @@ async function getProducts() {
   );
 
   if (!res.ok) return [];
-  return res.json();
+
+  const data = await res.json();
+
+  return Array.isArray(data) ? data : (data.data || []);
 }
 
 export default async function LandingPage() {
@@ -108,7 +111,7 @@ export default async function LandingPage() {
         {products.length > 0 ? (
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-              {products.map((product, index) => (
+              {products.map((product: Product, index: number) => (
                 <div
                   key={product.id}
                   data-aos="fade-up"
