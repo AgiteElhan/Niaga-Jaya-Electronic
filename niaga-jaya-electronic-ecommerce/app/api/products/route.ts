@@ -2,9 +2,8 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  try {
-    // 1. Ambil data dari backend Laravel Anda
-    const response = await fetch('http://localhost:8000/api/products', {
+  try {  
+    const response = await fetch('https://niagajayaelectronic-admin.se2.web.id/api/products', {
       headers: {
         'Content-Type': 'application/json',
       },

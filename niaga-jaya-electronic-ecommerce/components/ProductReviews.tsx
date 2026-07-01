@@ -28,7 +28,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const BACKEND_URL = "http://localhost:8000"; 
+        const BACKEND_URL = "https://niagajayaelectronic-admin.se2.web.id"; 
         const response = await fetch(`${BACKEND_URL}/api/products/${productId}/reviews`);
         if (response.ok) {
           const result = await response.json();

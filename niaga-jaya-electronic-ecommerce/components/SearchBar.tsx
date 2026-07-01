@@ -23,7 +23,7 @@ const SearchBar = () => {
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/products");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
         const data = await response.json();
         setAllProducts(data);
       } catch (error) {

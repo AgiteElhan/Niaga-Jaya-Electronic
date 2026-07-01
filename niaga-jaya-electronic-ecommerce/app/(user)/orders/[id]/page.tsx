@@ -107,7 +107,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
       if (!isSignedIn || !user?.id) return;
 
       try {
-        const BACKEND_URL = "http://localhost:8000"; 
+        const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;
         const response = await fetch(`${BACKEND_URL}/api/orders/${orderIdFromUrl}?clerk_id=${user.id}`);
         
         if (response.ok) {
@@ -135,10 +135,12 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
 
   const handleCancelOrder = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/orders/${order?.id}/cancel`,
-        { method: "POST" }
-      );
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/orders/${order?.id}/cancel`,
+      {
+        method: "POST",
+      }
+    );
 
       const data = await response.json();
 
@@ -211,7 +213,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
     setIsUpdatingStatus(true);  
 
     try {
-      const BACKEND_URL = "http://localhost:8000";
+      const BACKEND_URL = "https://niagajayaelectronic-admin.se2.web.id";
       const response = await fetch(`${BACKEND_URL}/api/orders/${order?.id}/receive`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -238,7 +240,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
     
     setIsSubmitting(true);
     try {
-      const BACKEND_URL = "http://localhost:8000";
+      const BACKEND_URL = "https://niagajayaelectronic-admin.se2.web.id";
       const payload = {
         pesanan_id: order?.id,
         produk_id: order?.items && order.items.length > 0 ? (order.items[0].product_id || order.items[0].id) : null,
@@ -641,8 +643,13 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                       <div key={index} className="flex flex-row items-center gap-4 sm:gap-6">
                         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 border border-slate-100 p-2 rounded-xl sm:rounded-2xl flex items-center justify-center overflow-hidden shrink-0">
                            <img 
-                             src={item.gambar_url || (item.gambar ? `http://localhost:8000/storage/products/${item.gambar}` : "/placeholder.png")} 
-                             alt={item.nama_produk} 
+                              src={
+                                item.gambar_url ||
+                                (item.gambar
+                                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/products/${item.gambar}`
+                                  : "/placeholder.png")
+                              }                             
+                            alt={item.nama_produk} 
                              className="object-contain w-full h-full" 
                              onError={(e) => { e.currentTarget.src = "/placeholder.png"; }}
                            />

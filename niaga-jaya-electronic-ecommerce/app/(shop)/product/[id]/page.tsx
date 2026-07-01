@@ -36,7 +36,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/products/${resolvedParams.id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${resolvedParams.id}`);
         if (!res.ok) throw new Error("Produk tidak ditemukan.");
         const json = await res.json();
         setProduct(json.data || json);

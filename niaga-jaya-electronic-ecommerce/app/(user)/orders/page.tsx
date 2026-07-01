@@ -38,9 +38,7 @@ export default function OrdersPage() {
       if (!isSignedIn || !user?.id) return;
 
       try {
-        const BACKEND_URL = "http://localhost:8000"; 
-        
-        // Mengirim parameter clerk_id unik milik user yang sedang aktif login
+        const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;        
         const response = await fetch(`${BACKEND_URL}/api/orders?clerk_id=${user.id}`);
         
         if (response.ok) {
@@ -150,8 +148,7 @@ export default function OrdersPage() {
                     <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 border border-slate-100 rounded-2xl p-2.5 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
                       {order.gambar_url ? (
                         <img 
-                          // Menggabungkan path Laravel storage dengan nama file gambar dari database
-                          src={`http://localhost:8000/storage/products/${order.gambar_url}`} 
+                          src={`${process.env.NEXT_PUBLIC_API_URL}/storage/products/${order.gambar_url}`}
                           alt={order.nama_produk} 
                           className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                         />

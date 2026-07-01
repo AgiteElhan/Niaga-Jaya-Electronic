@@ -41,8 +41,8 @@ export default function ShopPage() {
 useEffect(() => {
   const fetchAllData = async () => {
     try {
-      const BACKEND_URL = "http://localhost:8000";
-      
+    const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;
+
       // Fetch Produk
       const resProducts = await fetch(`${BACKEND_URL}/api/products`);
       const productsData = await resProducts.json();

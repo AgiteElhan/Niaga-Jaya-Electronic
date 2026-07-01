@@ -15,7 +15,9 @@ export default function PaymentPage() {
   const fetchPayment = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/payment/${orderId}`);
+      const res = await fetch(
+        `https://niagajayaelectronic-admin.se2.web.id/api/payment/${orderId}`
+      );
       const data = await res.json();
       setPayment(data);
     } catch (error) {
