@@ -410,8 +410,11 @@ class OrderController extends Controller
 
 
 
+            \Log::info('MIDTRANS PAYLOAD', $midtransPayload);
+
             $midtransResponse = CoreApi::charge($midtransPayload);
-            
+
+            \Log::info('MIDTRANS RESPONSE', json_decode(json_encode($midtransResponse), true));            
             DB::commit();
 
             DB::table('pesanan')
