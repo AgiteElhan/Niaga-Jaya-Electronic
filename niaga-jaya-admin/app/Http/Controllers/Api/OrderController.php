@@ -413,6 +413,13 @@ class OrderController extends Controller
             \Log::info('MIDTRANS PAYLOAD', $midtransPayload);
 
             $midtransResponse = CoreApi::charge($midtransPayload);
+            \Log::info('MIDTRANS CONFIG', [
+    'server_key' => \Midtrans\Config::$serverKey,
+    'is_production' => \Midtrans\Config::$isProduction,
+    'merchant_id' => config('services.midtrans.merchantId'),
+]);
+
+\Log::info('MIDTRANS PAYLOAD', $midtransPayload);
 
             \Log::info('MIDTRANS RESPONSE', json_decode(json_encode($midtransResponse), true));            
             DB::commit();
