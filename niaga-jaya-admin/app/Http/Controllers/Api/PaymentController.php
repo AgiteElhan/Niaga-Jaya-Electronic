@@ -11,14 +11,15 @@ class PaymentController extends Controller
 {
     public function handleCallback(Request $request)
     {
-        // 1. Ambil Server Key dari config/env (Sesuaikan dengan nama variabel env Anda)
-        // Jika Anda pakai package, biasanya config('midtrans.server_key')
-        $serverKey = env('MIDTRANS_SERVER_KEY'); 
 
-        // 2. Buat hash untuk verifikasi keamanan (wajib agar tidak di-hack)
+        $serverKey = config('services.midtrans.serverKey');
+
+        if (!$serverKey) {
+            Log::error('Midtrans Server Key tidak ditemukan di config.');
+            return response()->json(['message' => 'Server key missing'], 500);
+        }
         $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
 
-        // Jika signature tidak cocok, tolak request
         if ($hashed !== $request->signature_key) {
             Log::error('Midtrans Callback: Invalid Signature Key');
             return response()->json(['message' => 'Invalid signature'], 403);
